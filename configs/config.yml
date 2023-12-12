@@ -20,3 +20,6 @@ Database:
   ParseTime: True
   MaxIdleConns: 10
   MaxOpenConns: 30
+Ratelimit:
+  Enable: true
+  ConfigFile: sentinel.yml

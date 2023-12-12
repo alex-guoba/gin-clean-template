@@ -10,6 +10,7 @@ import (
 
 	"github.com/alex-guoba/gin-clean-template/global"
 	"github.com/alex-guoba/gin-clean-template/internal/dao"
+	"github.com/alex-guoba/gin-clean-template/internal/middleware/ratelimit"
 	"github.com/alex-guoba/gin-clean-template/internal/routers"
 	"github.com/alex-guoba/gin-clean-template/pkg/logger"
 	"github.com/alex-guoba/gin-clean-template/pkg/setting"
@@ -17,7 +18,16 @@ import (
 
 func main() {
 	gin.SetMode(global.ServerSetting.RunMode)
+
 	router := routers.NewRouter()
+	router.Use(gin.Recovery())
+
+	// global rate limit middleware
+	if global.RatelimitSetting.Enable {
+		// router.Use(ratelimit.New(global.RatelimitSetting.ConfigFile))
+		router.Use(ratelimit.New(global.RatelimitSetting.ConfigFile))
+	}
+
 	s := &http.Server{
 		Addr:           ":" + global.ServerSetting.HttpPort,
 		Handler:        router,
@@ -25,8 +35,6 @@ func main() {
 		WriteTimeout:   global.ServerSetting.WriteTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
-
-	// global.Logger.Infof(context.Background(), "%s: go-programming-tour-book/%s", "eddycjy", "blog-service")
 
 	s.ListenAndServe()
 }
@@ -51,7 +59,7 @@ func setupSetting() error {
 		return err
 	}
 
-	// 分段解析
+	// parsed by section
 	if setting.ReadSection("Server", &global.ServerSetting); err != nil {
 		return err
 	}
@@ -59,6 +67,9 @@ func setupSetting() error {
 		return err
 	}
 	if err := setting.ReadSection("Database", &global.DatabaseSetting); err != nil {
+		return err
+	}
+	if err := setting.ReadSection("Ratelimit", &global.RatelimitSetting); err != nil {
 		return err
 	}
 

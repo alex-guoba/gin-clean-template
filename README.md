@@ -22,6 +22,11 @@ $ go build
 $ ./gin-clean-template
 ```
 
+## Features
+
+- [x] Rate Limite
+
+
 ## Layered Architecture 
 
 There are 4 layers in this project:
@@ -52,9 +57,10 @@ Storage layer, facing the logical expression of operations on storage objects, i
 
 
 ## TODO
-- Remove global: [Why is Global State so Evil?](https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil)
-- Some neccesery stability measures should be completement.
-- Stress testing 
+- [ ] Remove global: [Why is Global State so Evil?](https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil)
+- [x] Some neccesery stability measures should be completement.
+- [ ] Stress testing 
+- [ ] add cobra
 
 
 ## Useful projects

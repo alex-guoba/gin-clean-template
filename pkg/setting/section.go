@@ -53,6 +53,11 @@ type DatabaseSettingS struct {
 	MaxOpenConns int
 }
 
+type RatelimitSettingS struct {
+	Enable     bool
+	ConfigFile string
+}
+
 var sections = make(map[string]interface{})
 
 func (s *Setting) ReadSection(k string, v interface{}) error {
