@@ -6,3 +6,4 @@ _*
 bin/
 *.out
 storage/*
+scripts/load-testing/output.bin
