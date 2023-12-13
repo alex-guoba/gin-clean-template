@@ -1,9 +1,10 @@
 package dao
 
 import (
+	"gorm.io/gorm"
+
 	"github.com/alex-guoba/gin-clean-template/global"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
-	"gorm.io/gorm"
 )
 
 // type TagSwagger struct {
@@ -92,12 +93,12 @@ func (d *TagDaoDB) CreateTag(name string, state uint8, createdBy string) error {
 		},
 	}
 
-	//return tag.Create(d.engine)
+	// return tag.Create(d.engine)
 	return d.engine.Create(&tag).Error
 }
 
 func (d *TagDaoDB) UpdateTag(id uint32, name string, state uint8, modifiedBy string) error {
-	values := map[string]interface{}{
+	values := map[string]any{
 		"state":       state,
 		"modified_by": modifiedBy,
 	}

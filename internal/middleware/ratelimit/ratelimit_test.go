@@ -31,7 +31,7 @@ func TestSentinelMiddleware(t *testing.T) {
 			want want
 		}{
 			{
-				name: "pass stragety non-adaptive",
+				name: "pass strategy non-adaptive",
 				args: args{
 					thresh:   1000,
 					strategy: int(system.NoAdaptive),
@@ -48,7 +48,7 @@ func TestSentinelMiddleware(t *testing.T) {
 				},
 			},
 			{
-				name: "pass stragety BBR",
+				name: "pass strategy BBR",
 				args: args{
 					thresh:   1000,
 					strategy: int(system.BBR),
@@ -65,7 +65,7 @@ func TestSentinelMiddleware(t *testing.T) {
 				},
 			},
 			{
-				name: "failed stragety non-adaptivet",
+				name: "failed strategy non-adaptivet",
 				args: args{
 					thresh:   0.0001, // smaller enough
 					strategy: int(system.NoAdaptive),
@@ -82,7 +82,7 @@ func TestSentinelMiddleware(t *testing.T) {
 				},
 			},
 			{
-				name: "pass stragety non-adaptivet",
+				name: "pass strategy non-adaptivet",
 				args: args{
 					thresh:   0.0001, // smaller enough
 					strategy: int(system.BBR),
@@ -116,4 +116,3 @@ func TestSentinelMiddleware(t *testing.T) {
 		})
 	}
 }
-gi

@@ -16,7 +16,7 @@ func NewArticle() Article {
 	return Article{}
 }
 
-func (t Article) checkParams(c *gin.Context, param interface{}, response *app.Response) error {
+func (Article) checkParams(c *gin.Context, param any, response *app.Response) error {
 	if err := c.ShouldBind(param); err != nil {
 		global.Logger.Errorf(c, "params errs: %v", err)
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(err.Error()))
@@ -37,11 +37,11 @@ func (t Article) checkParams(c *gin.Context, param interface{}, response *app.Re
 // @Success 200 {object} model.Article "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
-// @Router /api/v1/articles [post]
-func (a Article) Create(c *gin.Context) {
+// @Router /api/v1/articles [post].
+func (art Article) Create(c *gin.Context) {
 	param := service.CreateArticleRequest{}
 	response := app.NewResponse(c)
-	if a.checkParams(c, &param, response) != nil {
+	if art.checkParams(c, &param, response) != nil {
 		return
 	}
 
@@ -62,11 +62,11 @@ func (a Article) Create(c *gin.Context) {
 // @Success 200 {object} model.Article "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
-// @Router /api/v1/articles/{id} [get]
-func (a Article) Get(c *gin.Context) {
+// @Router /api/v1/articles/{id} [get].
+func (art Article) Get(c *gin.Context) {
 	param := service.ArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
-	if a.checkParams(c, &param, response) != nil {
+	if art.checkParams(c, &param, response) != nil {
 		return
 	}
 
@@ -91,11 +91,11 @@ func (a Article) Get(c *gin.Context) {
 // @Success 200 {object} model.ArticleSwagger "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
-// @Router /api/v1/articles [get]
-func (a Article) List(c *gin.Context) {
+// @Router /api/v1/articles [get].
+func (art Article) List(c *gin.Context) {
 	param := service.ArticleListRequest{}
 	response := app.NewResponse(c)
-	if a.checkParams(c, &param, response) != nil {
+	if art.checkParams(c, &param, response) != nil {
 		return
 	}
 
@@ -122,11 +122,11 @@ func (a Article) List(c *gin.Context) {
 // @Success 200 {object} model.Article "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
-// @Router /api/v1/articles/{id} [put]
-func (a Article) Update(c *gin.Context) {
+// @Router /api/v1/articles/{id} [put].
+func (art Article) Update(c *gin.Context) {
 	param := service.UpdateArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
-	if a.checkParams(c, &param, response) != nil {
+	if art.checkParams(c, &param, response) != nil {
 		return
 	}
 
@@ -147,11 +147,11 @@ func (a Article) Update(c *gin.Context) {
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
-// @Router /api/v1/articles/{id} [delete]
-func (a Article) Delete(c *gin.Context) {
+// @Router /api/v1/articles/{id} [delete].
+func (art Article) Delete(c *gin.Context) {
 	param := service.DeleteArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
-	if a.checkParams(c, &param, response) != nil {
+	if art.checkParams(c, &param, response) != nil {
 		return
 	}
 

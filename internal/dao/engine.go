@@ -3,9 +3,10 @@ package dao
 import (
 	"fmt"
 
-	"github.com/alex-guoba/gin-clean-template/pkg/setting"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"github.com/alex-guoba/gin-clean-template/pkg/setting"
 )
 
 func NewDBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
@@ -25,7 +26,7 @@ func NewDBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	// if global.ServerSetting.RunMode == "debug" {
 	// 	db.LogMode(true)
 	// }
-	//db.SingularTable(true)
+	// db.SingularTable(true)
 
 	sqlDB, err := db.DB()
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
 )
 
-// for validateor
+// for validateor.
 type CountTagRequest struct {
 	Name  string `form:"name" binding:"max=100"`
 	State uint8  `form:"state,default=1" binding:"oneof=0 1"`
@@ -37,11 +37,11 @@ type DeleteTagRequest struct {
 }
 
 // service loyer design principle:
-// 1. domain field should not seperate with each other
+// 1. domain field should not separate with each other
 // 2. service layer should not know the implementation of DAO layer
 // 3. service layer should be replaceable to other service layer
 
-// service
+// service.
 type TagService struct {
 	ctx    context.Context
 	domain *domain.TagDomain

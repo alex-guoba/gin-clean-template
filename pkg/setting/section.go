@@ -6,7 +6,7 @@ import (
 
 type ServerSettingS struct {
 	RunMode      string
-	HttpPort     string
+	HTTPPort     string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 }
@@ -19,7 +19,7 @@ type AppSettingS struct {
 	LogFileName           string
 	LogFileExt            string
 	UploadSavePath        string
-	UploadServerUrl       string
+	UploadServerURL       string
 	UploadImageMaxSize    int
 	UploadImageAllowExts  []string
 }
@@ -54,15 +54,15 @@ type DatabaseSettingS struct {
 }
 
 type RatelimitSettingS struct {
-	Enable        bool
-	ConfigFile    string
-	CpuLoadThresh float64
-	CpuLoadStrategy int
+	Enable          bool
+	ConfigFile      string
+	CPULoadThresh   float64
+	CPULoadStrategy int
 }
 
-var sections = make(map[string]interface{})
+var sections = make(map[string]any)
 
-func (s *Setting) ReadSection(k string, v interface{}) error {
+func (s *Setting) ReadSection(k string, v any) error {
 	err := s.vp.UnmarshalKey(k, v)
 	if err != nil {
 		return err

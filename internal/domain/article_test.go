@@ -23,7 +23,7 @@ func newModelsMock() (*dao.ArticleModel, *dao.TagModel, *dao.ArticleTagModel) {
 		Title:         "title",
 		Desc:          "desc",
 		Content:       "content",
-		CoverImageUrl: "image",
+		CoverImageURL: "image",
 		State:         1,
 		Model: &dao.Model{
 			ID:         1,
@@ -63,7 +63,7 @@ func TestArticleDomain_GetArticle(t *testing.T) {
 	articleDao.On("GetArticle", article.ID, article.State).Return(*article, nil)
 
 	tagDao := &mocks.TagDao{}
-	tagDao.On("GetTag", tag.ID, uint8(dao.STATE_OPEN)).Return(*tag, nil)
+	tagDao.On("GetTag", tag.ID, uint8(dao.StateOpen)).Return(*tag, nil)
 
 	artileTagDao := &mocks.ArticleTagDao{}
 	artileTagDao.On("GetArticleTagByAID", article.ID).Return(*articleTag, nil)

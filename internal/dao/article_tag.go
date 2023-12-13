@@ -2,6 +2,7 @@ package dao
 
 import (
 	"github.com/alex-guoba/gin-clean-template/global"
+
 	"gorm.io/gorm"
 )
 
@@ -22,7 +23,7 @@ func NewArticleTagDao() *ArticleTagDaoDB {
 	return &ArticleTagDaoDB{engine: global.DBEngine}
 }
 
-// TODO: combine single query and batch query
+// TODO: combine single query and batch query.
 func (d *ArticleTagDaoDB) GetArticleTagByAID(articleID uint32) (ArticleTagModel, error) {
 	var articleTag ArticleTagModel
 	if err := d.engine.Where("article_id = ? AND is_del = ?", articleID, 0).First(&articleTag).Error; err != nil && err != gorm.ErrRecordNotFound {
@@ -59,27 +60,18 @@ func (d *ArticleTagDaoDB) CreateArticleTag(articleID, tagID uint32, createdBy st
 		ArticleID: articleID,
 		TagID:     tagID,
 	}
-	if err := d.engine.Create(&at).Error; err != nil {
-		return err
-	}
-	return nil
+	return d.engine.Create(&at).Error
 }
 
 func (d *ArticleTagDaoDB) UpdateArticleTag(articleID, tagID uint32, modifiedBy string) error {
-	values := map[string]interface{}{
+	values := map[string]any{
 		"tag_id":      tagID,
 		"modified_by": modifiedBy,
 	}
-	if err := d.engine.Model(&ArticleTagModel{}).Where("article_id = ? AND is_del = ?", articleID, 0).Limit(1).Updates(values).Error; err != nil {
-		return err
-	}
-	return nil
+	return d.engine.Model(&ArticleTagModel{}).Where("article_id = ? AND is_del = ?", articleID, 0).Limit(1).Updates(values).Error
 }
 
 func (d *ArticleTagDaoDB) DeleteArticleTag(articleID uint32) error {
 	articleTag := ArticleTagModel{ArticleID: articleID}
-	if err := d.engine.Where("article_id = ? AND is_del = ?", articleID, 0).Delete(&articleTag).Limit(1).Error; err != nil {
-		return err
-	}
-	return nil
+	return d.engine.Where("article_id = ? AND is_del = ?", articleID, 0).Delete(&articleTag).Limit(1).Error
 }

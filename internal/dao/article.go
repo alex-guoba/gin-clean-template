@@ -1,9 +1,10 @@
 package dao
 
 import (
+	"gorm.io/gorm"
+
 	"github.com/alex-guoba/gin-clean-template/global"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
-	"gorm.io/gorm"
 )
 
 type ArticleDaoDB struct {
@@ -31,7 +32,7 @@ func (d *ArticleDaoDB) CreateArticle(title string, desc string, content string, 
 		Title:         title,
 		Desc:          desc,
 		Content:       content,
-		CoverImageUrl: image,
+		CoverImageURL: image,
 		State:         state,
 		Model:         &Model{CreatedBy: createdBy},
 	}
@@ -44,7 +45,7 @@ func (d *ArticleDaoDB) CreateArticle(title string, desc string, content string, 
 
 func (d *ArticleDaoDB) UpdateArticle(id uint32, title string, desc string, content string, image string,
 	state uint8, modifiedBy string) error {
-	values := map[string]interface{}{
+	values := map[string]any{
 		"modified_by": modifiedBy,
 		"state":       state,
 	}
@@ -61,11 +62,7 @@ func (d *ArticleDaoDB) UpdateArticle(id uint32, title string, desc string, conte
 		values["content"] = content
 	}
 
-	if err := d.engine.Model(&ArticleModel{}).Where("id = ? AND is_del = ?", id, 0).Updates(values).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return d.engine.Model(&ArticleModel{}).Where("id = ? AND is_del = ?", id, 0).Updates(values).Error
 }
 
 func (d *ArticleDaoDB) GetArticle(id uint32, state uint8) (ArticleModel, error) {
@@ -80,11 +77,7 @@ func (d *ArticleDaoDB) GetArticle(id uint32, state uint8) (ArticleModel, error) 
 
 func (d *ArticleDaoDB) DeleteArticle(id uint32) error {
 	article := ArticleModel{Model: &Model{ID: id}}
-	if err := d.engine.Where("id = ? AND is_del = ?", id, 0).Delete(&article).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return d.engine.Where("id = ? AND is_del = ?", id, 0).Delete(&article).Error
 }
 
 func (d *ArticleDaoDB) CountArticleListByTagID(id uint32, state uint8) (int64, error) {
@@ -128,7 +121,7 @@ func (d *ArticleDaoDB) GetArticleListByTagID(id uint32, state uint8, page, pageS
 		Joins("LEFT JOIN `"+ArticleModel{}.TableName()+"` AS ar ON at.article_id = ar.id").
 		Where("at.`tag_id` = ? AND ar.state = ? AND ar.is_del = ?", id, state, 0).
 		Rows()
-	if err != nil {
+	if err != nil || rows.Err() != nil {
 		return nil, err
 	}
 	defer rows.Close()
@@ -136,7 +129,7 @@ func (d *ArticleDaoDB) GetArticleListByTagID(id uint32, state uint8, page, pageS
 	var articles []*ArticleTagRow
 	for rows.Next() {
 		r := newArticleTagRow()
-		if err := rows.Scan(&r.Article.ID, &r.Article.Title, &r.Article.Desc, &r.Article.CoverImageUrl,
+		if err := rows.Scan(&r.Article.ID, &r.Article.Title, &r.Article.Desc, &r.Article.CoverImageURL,
 			&r.Article.Content, &r.Tag.ID, &r.Tag.Name); err != nil {
 			return nil, err
 		}

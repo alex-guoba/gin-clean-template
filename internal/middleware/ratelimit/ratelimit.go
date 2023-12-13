@@ -1,7 +1,6 @@
 package ratelimit
 
 import (
-	"log"
 	"net/http"
 	"runtime"
 
@@ -13,18 +12,18 @@ import (
 )
 
 const (
-	DefaultCpuLoadThresholdPerCore = 2
+	DftCPULoadThreshPerCore = 2
 )
 
-func initConfig(cfg string, loadThresh float64, loadStrategy int) {
+func initConfig(cfg string, loadThresh float64, loadStrategy int) error {
 	// config file format: https://github.com/alibaba/sentinel-golang/wiki/%E5%90%AF%E5%8A%A8%E9%85%8D%E7%BD%AE
 	if len(cfg) == 0 {
 		if err := sentinel.InitDefault(); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	} else {
 		if err := sentinel.InitWithConfigFile(cfg); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
@@ -33,7 +32,7 @@ func initConfig(cfg string, loadThresh float64, loadStrategy int) {
 	// how system adaptive rules works: https://sentinelguard.io/zh-cn/docs/system-adaptive-protection.html
 	var loadTrigger = loadThresh
 	if loadTrigger <= 0 {
-		loadTrigger = float64(DefaultCpuLoadThresholdPerCore * runtime.NumCPU())
+		loadTrigger = float64(DftCPULoadThreshPerCore * runtime.NumCPU())
 	}
 	if loadStrategy < int(system.NoAdaptive) || loadStrategy > int(system.BBR) {
 		loadStrategy = int(system.NoAdaptive)
@@ -47,16 +46,19 @@ func initConfig(cfg string, loadThresh float64, loadStrategy int) {
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// global.Logger.Info(context.Background(), "init sentinel success, load trigger ", loadTrigger)
+	return nil
 }
 
 // See: https://pkg.go.dev/github.com/alibaba/sentinel-golang/pkg/adapters/gin
 func New(cfg string, loadThresh float64, loadStrategy int) gin.HandlerFunc {
 	// init default
-	initConfig(cfg, loadThresh, loadStrategy)
+	if err := initConfig(cfg, loadThresh, loadStrategy); err != nil {
+		return nil
+	}
 
 	return func(c *gin.Context) {
 		resourceName := c.Request.Method + ":" + c.FullPath()
@@ -69,7 +71,7 @@ func New(cfg string, loadThresh float64, loadStrategy int) gin.HandlerFunc {
 		)
 
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusTooManyRequests, map[string]interface{}{
+			c.AbortWithStatusJSON(http.StatusTooManyRequests, map[string]any{
 				"err":  "too many request; the quota used up",
 				"code": 10222,
 			})
@@ -79,5 +81,4 @@ func New(cfg string, loadThresh float64, loadStrategy int) gin.HandlerFunc {
 		defer entry.Exit()
 		c.Next()
 	}
-
 }

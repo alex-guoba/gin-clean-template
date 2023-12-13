@@ -14,7 +14,7 @@ type ArticleEntity struct {
 	Title         string     `json:"title"`
 	Desc          string     `json:"desc"`
 	Content       string     `json:"content"`
-	CoverImageUrl string     `json:"cover_image_url"`
+	CoverImageURL string     `json:"cover_image_url"`
 	State         uint8      `json:"state"`
 	Tag           *TagEntity `json:"tag"`
 }

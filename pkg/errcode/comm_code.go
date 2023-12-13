@@ -13,6 +13,6 @@ var (
 )
 
 var (
-	// 10001000 - 10002000: blog error code
+	// 10001000 - 10002000: blog error code.
 	ErrTagIDForbidden = NewError(10001000, "`Tag` in used by other article")
 )

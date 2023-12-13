@@ -2,6 +2,7 @@ package routers
 
 import (
 	v1 "github.com/alex-guoba/gin-clean-template/internal/routers/api/v1"
+
 	"github.com/gin-gonic/gin"
 )
 

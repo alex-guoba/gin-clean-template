@@ -7,7 +7,6 @@ import (
 	"github.com/alex-guoba/gin-clean-template/internal/entity"
 )
 
-// service
 type ArticleDomain struct {
 	ctx          context.Context
 	articleDao   dao.ArticleDao
@@ -37,7 +36,7 @@ func (d *ArticleDomain) GetArticle(id uint32, state uint8) (*entity.ArticleEntit
 	}
 
 	// Query tag info
-	tag, err := d.tagDao.GetTag(articleTag.TagID, dao.STATE_OPEN)
+	tag, err := d.tagDao.GetTag(articleTag.TagID, dao.StateOpen)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +47,7 @@ func (d *ArticleDomain) GetArticle(id uint32, state uint8) (*entity.ArticleEntit
 		Title:         article.Title,
 		Desc:          article.Desc,
 		Content:       article.Content,
-		CoverImageUrl: article.CoverImageUrl,
+		CoverImageURL: article.CoverImageURL,
 		State:         article.State,
 		Tag: &entity.TagEntity{
 			ID:         tag.ID,
@@ -88,7 +87,7 @@ func (d *ArticleDomain) GetArticleList(id uint32, state uint8, page, pageSize in
 			Title:         row.Article.Title,
 			Desc:          row.Article.Desc,
 			Content:       row.Article.Content,
-			CoverImageUrl: row.Article.CoverImageUrl,
+			CoverImageURL: row.Article.CoverImageURL,
 			Tag: &entity.TagEntity{
 				ID:   row.Tag.ID,
 				Name: row.Tag.Name,
@@ -108,11 +107,7 @@ func (d *ArticleDomain) CreateArticle(title string, desc string, content string,
 	}
 
 	// Insert article tag relation
-	if err = d.artileTagDao.CreateArticleTag(article.ID, tagID, createdBy); err != nil {
-		return err
-	}
-
-	return nil
+	return d.artileTagDao.CreateArticleTag(article.ID, tagID, createdBy)
 }
 
 func (d *ArticleDomain) UpdateArticle(artitleID uint32, title string, desc string, content string, image string,
@@ -124,11 +119,7 @@ func (d *ArticleDomain) UpdateArticle(artitleID uint32, title string, desc strin
 	}
 
 	// Update article tag relation
-	if err := d.artileTagDao.UpdateArticleTag(artitleID, tagID, modifiedBy); err != nil {
-		return err
-	}
-
-	return nil
+	return d.artileTagDao.UpdateArticleTag(artitleID, tagID, modifiedBy)
 }
 
 func (d *ArticleDomain) DeleteArticle(id uint32) error {
@@ -138,9 +129,5 @@ func (d *ArticleDomain) DeleteArticle(id uint32) error {
 	}
 
 	// Delete article tag relation
-	if err := d.artileTagDao.DeleteArticleTag(id); err != nil {
-		return err
-	}
-
-	return nil
+	return d.artileTagDao.DeleteArticleTag(id)
 }

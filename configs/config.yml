@@ -1,6 +1,6 @@
 Server:
   RunMode: debug
-  HttpPort: 8000
+  HTTPPort: 8000
   ReadTimeout: 60
   WriteTimeout: 60
 App:
@@ -23,5 +23,5 @@ Database:
 Ratelimit:
   Enable: true
   ConfigFile: sentinel.yml
-  CpuLoadThresh: 1
-  CpuLoadStrategy: 0 # 0: BBR, -1: NoAdaptive
+  CPULoadThresh: 1
+  CPULoadStrategy: 0 # 0: BBR, -1: NoAdaptive

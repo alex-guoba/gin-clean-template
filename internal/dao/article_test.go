@@ -88,7 +88,7 @@ func TestArticleDao_CreateArticle(t *testing.T) {
 				return
 			}
 			if got == nil || ((got.Title != tt.args.title) || (got.Desc != tt.args.desc) ||
-				(got.Content != tt.args.content) || (got.CoverImageUrl != tt.args.image) || (got.State != tt.args.state)) {
+				(got.Content != tt.args.content) || (got.CoverImageURL != tt.args.image) || (got.State != tt.args.state)) {
 				t.Errorf("ArticleDaoDB.CreateArticle() = %v, want %v", got, tt.want)
 			}
 		})
@@ -196,7 +196,7 @@ func TestArticleDao_GetArticle(t *testing.T) {
 				Title:         "title",
 				Desc:          "desc",
 				Content:       "content",
-				CoverImageUrl: "image",
+				CoverImageURL: "image",
 				State:         tt.args.state,
 				Model: &Model{
 					ID: tt.args.id,
@@ -206,7 +206,7 @@ func TestArticleDao_GetArticle(t *testing.T) {
 				WithArgs(tt.args.id, tt.args.state).
 				WillReturnRows(
 					sqlmock.NewRows([]string{"id", "title", "desc", "cover_image_url", "content", "created_by", "modified_by", "is_del", "state"}).
-						AddRow("1024", article.Title, article.Desc, article.CoverImageUrl, article.Content, article.CreatedBy, article.ModifiedBy, "0", article.State),
+						AddRow("1024", article.Title, article.Desc, article.CoverImageURL, article.Content, article.CreatedBy, article.ModifiedBy, "0", article.State),
 				)
 
 			got, err := d.GetArticle(tt.args.id, tt.args.state)
@@ -214,7 +214,7 @@ func TestArticleDao_GetArticle(t *testing.T) {
 				t.Errorf("ArticleDaoDB.GetArticle() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if (got.Title != article.Title) || (got.Desc != article.Desc) || (got.CoverImageUrl != article.CoverImageUrl) ||
+			if (got.Title != article.Title) || (got.Desc != article.Desc) || (got.CoverImageURL != article.CoverImageURL) ||
 				(got.Content != article.Content) || (got.State != article.State) || (got.ID != article.ID) {
 				t.Errorf("ArticleDaoDB.GetArticle() = %v, want %v", got, article)
 			}

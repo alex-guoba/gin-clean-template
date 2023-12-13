@@ -1,8 +1,8 @@
 package dao
 
 const (
-	STATE_OPEN  = 1
-	STATE_CLOSE = 0
+	StateOpen  = 1
+	StateClose = 0
 )
 
 type Model struct {
@@ -12,38 +12,38 @@ type Model struct {
 	IsDel      uint8  `json:"is_del"`
 }
 
-// Model: Tag
+// Model to tag.
 type TagModel struct {
 	*Model
 	Name  string `json:"name"`
 	State uint8  `json:"state"`
 }
 
-func (t TagModel) TableName() string {
+func (TagModel) TableName() string {
 	return "blog_tag"
 }
 
-// Model: Artile
+// Model to Artile.
 type ArticleModel struct {
 	*Model
 	Title         string `json:"title"`
 	Desc          string `json:"desc"`
 	Content       string `json:"content"`
-	CoverImageUrl string `json:"cover_image_url"`
+	CoverImageURL string `json:"cover_image_url"`
 	State         uint8  `json:"state"`
 }
 
-func (a ArticleModel) TableName() string {
+func (ArticleModel) TableName() string {
 	return "blog_article"
 }
 
-// Model: Artile-Tag
+// Model to Artile-Tag.
 type ArticleTagModel struct {
 	*Model
 	TagID     uint32 `json:"tag_id"`
 	ArticleID uint32 `json:"article_id"`
 }
 
-func (a ArticleTagModel) TableName() string {
+func (ArticleTagModel) TableName() string {
 	return "blog_article_tag"
 }

@@ -24,7 +24,7 @@ type CreateArticleRequest struct {
 	Title         string `form:"title" binding:"required,min=2,max=100"`
 	Desc          string `form:"desc" binding:"required,min=2,max=255"`
 	Content       string `form:"content" binding:"required,min=2,max=4294967295"`
-	CoverImageUrl string `form:"cover_image_url" binding:"required,url"`
+	CoverImageURL string `form:"cover_image_url" binding:"required,url"`
 	CreatedBy     string `form:"created_by" binding:"required,min=2,max=100"`
 	State         uint8  `form:"state,default=1" binding:"oneof=0 1"`
 }
@@ -35,7 +35,7 @@ type UpdateArticleRequest struct {
 	Title         string `form:"title" binding:"omitempty,min=2,max=100"`
 	Desc          string `form:"desc" binding:"omitempty,min=2,max=255"`
 	Content       string `form:"content" binding:"omitempty,min=2,max=4294967295"`
-	CoverImageUrl string `form:"cover_image_url" binding:"omitempty,url"`
+	CoverImageURL string `form:"cover_image_url" binding:"omitempty,url"`
 	ModifiedBy    string `form:"modified_by" binding:"required,min=2,max=100"`
 	State         uint8  `form:"state,default=1" binding:"omitempty,oneof=0 1"`
 }
@@ -44,7 +44,6 @@ type DeleteArticleRequest struct {
 	ID uint32 `form:"id" binding:"required,gte=1"`
 }
 
-// service
 type ArticleService struct {
 	ctx    context.Context
 	domain *domain.ArticleDomain
@@ -72,28 +71,15 @@ func (svc *ArticleService) GetArticleList(param *ArticleListRequest, pager *app.
 }
 
 func (svc *ArticleService) CreateArticle(param *CreateArticleRequest) error {
-	err := svc.domain.CreateArticle(param.Title, param.Desc,
-		param.Content, param.CoverImageUrl, param.State, param.CreatedBy, param.TagID)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return svc.domain.CreateArticle(param.Title, param.Desc,
+		param.Content, param.CoverImageURL, param.State, param.CreatedBy, param.TagID)
 }
 
 func (svc *ArticleService) UpdateArticle(param *UpdateArticleRequest) error {
-	if err := svc.domain.UpdateArticle(param.ID, param.Title, param.Desc, param.Content,
-		param.CoverImageUrl, param.State, param.ModifiedBy, param.TagID); err != nil {
-		return err
-	}
-
-	return nil
+	return svc.domain.UpdateArticle(param.ID, param.Title, param.Desc, param.Content,
+		param.CoverImageURL, param.State, param.ModifiedBy, param.TagID)
 }
 
 func (svc *ArticleService) DeleteArticle(param *DeleteArticleRequest) error {
-	if err := svc.domain.DeleteArticle(param.ID); err != nil {
-		return err
-	}
-
-	return nil
+	return svc.domain.DeleteArticle(param.ID)
 }

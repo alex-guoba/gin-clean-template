@@ -26,21 +26,25 @@ func main() {
 
 	// global rate limit middleware
 	if global.RatelimitSetting.Enable {
-		r.Use(ratelimit.New(global.RatelimitSetting.ConfigFile,
-			global.RatelimitSetting.CpuLoadThresh, global.RatelimitSetting.CpuLoadStrategy))
+		limiter := ratelimit.New(global.RatelimitSetting.ConfigFile,
+			global.RatelimitSetting.CPULoadThresh, global.RatelimitSetting.CPULoadStrategy)
+		if limiter == nil {
+			log.Fatal("init rate limit middleware failed")
+		}
+		r.Use(limiter)
 	}
 
 	routers.SetRouters(r)
 
 	// use http server
 	s := &http.Server{
-		Addr:           ":" + global.ServerSetting.HttpPort,
+		Addr:           ":" + global.ServerSetting.HTTPPort,
 		Handler:        r,
 		ReadTimeout:    global.ServerSetting.ReadTimeout,
 		WriteTimeout:   global.ServerSetting.WriteTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
-	s.ListenAndServe()
+	_ = s.ListenAndServe()
 
 	// use gin server
 	// r.Run(":" + global.ServerSetting.HttpPort)
@@ -67,10 +71,10 @@ func setupSetting() error {
 	}
 
 	// parsed by section
-	if setting.ReadSection("Server", &global.ServerSetting); err != nil {
+	if err := setting.ReadSection("Server", &global.ServerSetting); err != nil {
 		return err
 	}
-	if setting.ReadSection("App", &global.AppSetting); err != nil {
+	if err := setting.ReadSection("App", &global.AppSetting); err != nil {
 		return err
 	}
 	if err := setting.ReadSection("Database", &global.DatabaseSetting); err != nil {
