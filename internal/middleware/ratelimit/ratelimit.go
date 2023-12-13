@@ -3,6 +3,7 @@ package ratelimit
 import (
 	"log"
 	"net/http"
+	"runtime"
 
 	sentinel "github.com/alibaba/sentinel-golang/api"
 	"github.com/alibaba/sentinel-golang/core/base"
@@ -11,7 +12,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func initConfig(cfg string) {
+const (
+	DefaultCpuLoadThresholdPerCore = 2
+)
+
+func initConfig(cfg string, loadThresh float64, loadStrategy int) {
 	// config file format: https://github.com/alibaba/sentinel-golang/wiki/%E5%90%AF%E5%8A%A8%E9%85%8D%E7%BD%AE
 	if len(cfg) == 0 {
 		if err := sentinel.InitDefault(); err != nil {
@@ -26,32 +31,40 @@ func initConfig(cfg string) {
 	// init rules. see https://github.com/alibaba/sentinel-golang/wiki/%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6
 	// we just used system rules here by default.
 	// how system adaptive rules works: https://sentinelguard.io/zh-cn/docs/system-adaptive-protection.html
+	var loadTrigger = loadThresh
+	if loadTrigger <= 0 {
+		loadTrigger = float64(DefaultCpuLoadThresholdPerCore * runtime.NumCPU())
+	}
+	if loadStrategy < int(system.NoAdaptive) || loadStrategy > int(system.BBR) {
+		loadStrategy = int(system.NoAdaptive)
+	}
 	_, err := system.LoadRules([]*system.Rule{
 		{
 			ID:           "DefaultSystemRule",
-			MetricType:   system.CpuUsage,
-			TriggerCount: 0.8, // 80%
-			Strategy:     system.BBR,
+			MetricType:   system.Load,
+			TriggerCount: loadTrigger,
+			Strategy:     system.AdaptiveStrategy(loadStrategy),
 		},
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// global.Logger.Info(context.Background(), "init sentinel success, load trigger ", loadTrigger)
 }
 
 // See: https://pkg.go.dev/github.com/alibaba/sentinel-golang/pkg/adapters/gin
-func New(cfg string) gin.HandlerFunc {
+func New(cfg string, loadThresh float64, loadStrategy int) gin.HandlerFunc {
 	// init default
-	initConfig(cfg)
+	initConfig(cfg, loadThresh, loadStrategy)
 
 	return func(c *gin.Context) {
-		// resourceName := c.Request.Method + ":" + c.FullPath()
-		resourceName := c.GetHeader("X-Real-IP")
+		resourceName := c.Request.Method + ":" + c.FullPath()
+		// resourceName := c.GetHeader("X-Real-IP")
 
-		// TODO: adjust default config
 		entry, err := sentinel.Entry(
 			resourceName,
-			sentinel.WithResourceType(base.ResTypeWeb),
+			sentinel.WithResourceType(base.ResTypeAPIGateway),
 			sentinel.WithTrafficType(base.Inbound),
 		)
 

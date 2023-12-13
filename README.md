@@ -24,8 +24,8 @@ $ ./gin-clean-template
 
 ## Features
 
-- [x] Rate Limite
-
+- [x] Overload Protection
+With the overload protection capabilities of [sentinel](https://github.com/alibaba/sentinel-golang)，system adaptive overload protection capabilities are implemented.
 
 ## Layered Architecture 
 

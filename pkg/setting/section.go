@@ -54,8 +54,10 @@ type DatabaseSettingS struct {
 }
 
 type RatelimitSettingS struct {
-	Enable     bool
-	ConfigFile string
+	Enable        bool
+	ConfigFile    string
+	CpuLoadThresh float64
+	CpuLoadStrategy int
 }
 
 var sections = make(map[string]interface{})

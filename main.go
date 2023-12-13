@@ -19,24 +19,31 @@ import (
 func main() {
 	gin.SetMode(global.ServerSetting.RunMode)
 
-	router := routers.NewRouter()
-	router.Use(gin.Recovery())
+	r := gin.New()
+
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
 
 	// global rate limit middleware
 	if global.RatelimitSetting.Enable {
-		// router.Use(ratelimit.New(global.RatelimitSetting.ConfigFile))
-		router.Use(ratelimit.New(global.RatelimitSetting.ConfigFile))
+		r.Use(ratelimit.New(global.RatelimitSetting.ConfigFile,
+			global.RatelimitSetting.CpuLoadThresh, global.RatelimitSetting.CpuLoadStrategy))
 	}
 
+	routers.SetRouters(r)
+
+	// use http server
 	s := &http.Server{
 		Addr:           ":" + global.ServerSetting.HttpPort,
-		Handler:        router,
+		Handler:        r,
 		ReadTimeout:    global.ServerSetting.ReadTimeout,
 		WriteTimeout:   global.ServerSetting.WriteTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
-
 	s.ListenAndServe()
+
+	// use gin server
+	// r.Run(":" + global.ServerSetting.HttpPort)
 }
 
 func init() {
@@ -89,6 +96,7 @@ func setupDBEngine() error {
 }
 
 func setupLogger() error {
+	// TODO:  区分系统日志和trace日志。系统日志使用标准库，trace日志基于logrus改造即可。不用纠结了
 	global.Logger = logger.NewLogger(&lumberjack.Logger{
 		Filename:  global.AppSetting.LogSavePath + "/" + global.AppSetting.LogFileName + global.AppSetting.LogFileExt,
 		MaxSize:   600,

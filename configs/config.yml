@@ -23,3 +23,5 @@ Database:
 Ratelimit:
   Enable: true
   ConfigFile: sentinel.yml
+  CpuLoadThresh: 1
+  CpuLoadStrategy: 0 # 0: BBR, -1: NoAdaptive

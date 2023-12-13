@@ -5,11 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter() *gin.Engine {
-	r := gin.New()
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
-
+func SetRouters(r *gin.Engine) {
 	article := v1.NewArticle()
 	tag := v1.NewTag()
 	apiv1 := r.Group("/api/v1")
@@ -36,6 +32,4 @@ func NewRouter() *gin.Engine {
 
 		// Add other router if necessary
 	}
-
-	return r
 }
