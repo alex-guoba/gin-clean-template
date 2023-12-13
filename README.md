@@ -27,6 +27,34 @@ $ ./gin-clean-template
 - [x] Overload Protection
 With the overload protection capabilities of [sentinel](https://github.com/alibaba/sentinel-golang)，system adaptive overload protection capabilities are implemented.
 
+- [x] Load Testing
+``` shell
+» ./scripts/load-testing/start_load_testing.sh
+
+Text output:
+Requests      [total, rate, throughput]         156889, 15686.32, 4762.42
+Duration      [total, attack, wait]             10.004s, 10.002s, 1.894ms
+Latencies     [min, mean, 50, 90, 95, 99, max]  32.917µs, 12.25ms, 3.367ms, 28.519ms, 45.603ms, 152.698ms, 1.101s
+Bytes In      [total, mean]                     22006503, 140.27
+Bytes Out     [total, mean]                     0, 0.00
+Success       [ratio]                           30.37%
+Status Codes  [code:count]                      0:65  200:47641  429:109183
+Error Set:
+Get "http://127.0.0.1:8000/api/v1/tags": read tcp 127.0.0.1:60416->127.0.0.1:8000: read: connection reset by peer
+Get "http://127.0.0.1:8000/api/v1/tags": read tcp 127.0.0.1:60417->127.0.0.1:8000: read: connection reset by peer
+429 Too Many Requests
+
+Histogram output:
+Bucket           #       %       Histogram
+[0s,     10ms]   115958  73.91%  #######################################################
+[10ms,   40ms]   31313   19.96%  ##############
+[40ms,   80ms]   6390    4.07%   ###
+[80ms,   200ms]  2141    1.36%   #
+[200ms,  500ms]  1023    0.65%
+[500ms,  1s]     63      0.04%
+[1s,     +Inf]   1       0.00%
+```
+
 ## Layered Architecture 
 
 There are 4 layers in this project:
@@ -58,8 +86,6 @@ Storage layer, facing the logical expression of operations on storage objects, i
 
 ## TODO
 - [ ] Remove global: [Why is Global State so Evil?](https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil)
-- [x] Some neccesery stability measures should be completement.
-- [ ] Stress testing 
 - [ ] add cobra
 
 

@@ -1,6 +1,7 @@
 package ratelimit
 
 import (
+	"log"
 	"net/http"
 	"runtime"
 
@@ -49,7 +50,7 @@ func initConfig(cfg string, loadThresh float64, loadStrategy int) error {
 		return err
 	}
 
-	// global.Logger.Info(context.Background(), "init sentinel success, load trigger ", loadTrigger)
+	log.Printf("Init sentinel success, load trigger %v, load strategy %v", loadTrigger, loadStrategy)
 	return nil
 }
 
