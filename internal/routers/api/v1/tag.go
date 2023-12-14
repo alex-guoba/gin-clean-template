@@ -3,11 +3,11 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/alex-guoba/gin-clean-template/global"
 	"github.com/alex-guoba/gin-clean-template/internal/service"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
 	"github.com/alex-guoba/gin-clean-template/pkg/convert"
 	"github.com/alex-guoba/gin-clean-template/pkg/errcode"
+	"github.com/alex-guoba/gin-clean-template/pkg/logger"
 )
 
 type Tag struct{}
@@ -18,7 +18,7 @@ func NewTag() Tag {
 
 func (Tag) checkParams(c *gin.Context, param any, response *app.Response) error {
 	if err := c.ShouldBind(param); err != nil {
-		global.Logger.Errorf(c, "param errs: %v", err)
+		logger.WithTrace(c).Errorf("param errs: %v", err)
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(err.Error()))
 		return err
 	}
@@ -47,7 +47,7 @@ func (t Tag) List(c *gin.Context) {
 
 	tags, cnt, err := svc.GetTagListWithCnt(&param, &pager)
 	if err != nil {
-		global.Logger.Errorf(c, "svc.GetTagList err: %v", err)
+		logger.WithTrace(c).Errorf("svc.GetTagList err: %v", err)
 		response.ToErrorResponse(errcode.ErrorGetTagListFail)
 		return
 	}
@@ -72,7 +72,7 @@ func (t Tag) Create(c *gin.Context) {
 	}
 	svc := service.NewTagService(c.Request.Context())
 	if err := svc.CreateTag(&param); err != nil {
-		global.Logger.Errorf(c, "svc.CreateTag err: %v", err)
+		logger.WithTrace(c).Errorf("svc.CreateTag err: %v", err)
 		response.ToErrorResponse(errcode.ErrorCreateTagFail)
 		return
 	}
@@ -101,7 +101,7 @@ func (t Tag) Update(c *gin.Context) {
 
 	svc := service.NewTagService(c.Request.Context())
 	if err := svc.UpdateTag(&param); err != nil {
-		global.Logger.Errorf(c, "svc.UpdateTag err: %v", err)
+		logger.WithTrace(c).Errorf("svc.UpdateTag err: %v", err)
 		response.ToErrorResponse(errcode.ErrorUpdateTagFail)
 		return
 	}
@@ -125,7 +125,7 @@ func (t Tag) Delete(c *gin.Context) {
 
 	svc := service.NewTagService(c.Request.Context())
 	if err := svc.DeleteTag(&param); err != nil {
-		global.Logger.Errorf(c, "svc.DeleteTag err: %v", err)
+		logger.WithTrace(c).Errorf("svc.DeleteTag err: %v", err)
 		response.ToErrorResponse(errcode.ErrorDeleteTagFail)
 		return
 	}

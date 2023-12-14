@@ -3,11 +3,11 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/alex-guoba/gin-clean-template/global"
 	"github.com/alex-guoba/gin-clean-template/internal/service"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
 	"github.com/alex-guoba/gin-clean-template/pkg/convert"
 	"github.com/alex-guoba/gin-clean-template/pkg/errcode"
+	"github.com/alex-guoba/gin-clean-template/pkg/logger"
 )
 
 type Article struct{}
@@ -18,7 +18,7 @@ func NewArticle() Article {
 
 func (Article) checkParams(c *gin.Context, param any, response *app.Response) error {
 	if err := c.ShouldBind(param); err != nil {
-		global.Logger.Errorf(c, "params errs: %v", err)
+		logger.WithTrace(c).Errorf("params errs: %v", err)
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(err.Error()))
 		return err
 	}
@@ -48,7 +48,7 @@ func (art Article) Create(c *gin.Context) {
 	svc := service.NewArticleService(c.Request.Context())
 	err := svc.CreateArticle(&param)
 	if err != nil {
-		global.Logger.Errorf(c, "svc.CreateArticle err: %v", err)
+		logger.WithTrace(c).Errorf("svc.CreateArticle err: %v", err)
 		response.ToErrorResponse(errcode.ErrorCreateArticleFail)
 		return
 	}
@@ -73,7 +73,7 @@ func (art Article) Get(c *gin.Context) {
 	svc := service.NewArticleService(c.Request.Context())
 	article, err := svc.GetArticle(&param)
 	if err != nil {
-		global.Logger.Errorf(c, "svc.GetArticle err: %v", err)
+		logger.WithTrace(c).Errorf("svc.GetArticle err: %v", err)
 		response.ToErrorResponse(errcode.ErrorGetArticleFail)
 		return
 	}
@@ -103,7 +103,7 @@ func (art Article) List(c *gin.Context) {
 	pager := app.Pager{Page: app.GetPage(c), PageSize: app.GetPageSize(c)}
 	articles, totalRows, err := svc.GetArticleList(&param, &pager)
 	if err != nil {
-		global.Logger.Errorf(c, "svc.GetArticleList err: %v", err)
+		logger.WithTrace(c).Errorf("svc.GetArticleList err: %v", err)
 		response.ToErrorResponse(errcode.ErrorGetArticlesFail)
 		return
 	}
@@ -133,7 +133,7 @@ func (art Article) Update(c *gin.Context) {
 	svc := service.NewArticleService(c.Request.Context())
 	err := svc.UpdateArticle(&param)
 	if err != nil {
-		global.Logger.Errorf(c, "svc.UpdateArticle err: %v", err)
+		logger.WithTrace(c).Errorf("svc.UpdateArticle err: %v", err)
 		response.ToErrorResponse(errcode.ErrorUpdateArticleFail)
 		return
 	}
@@ -158,7 +158,7 @@ func (art Article) Delete(c *gin.Context) {
 	svc := service.NewArticleService(c.Request.Context())
 	err := svc.DeleteArticle(&param)
 	if err != nil {
-		global.Logger.Errorf(c, "svc.DeleteArticle err: %v", err)
+		logger.WithTrace(c).Errorf("svc.DeleteArticle err: %v", err)
 		response.ToErrorResponse(errcode.ErrorDeleteArticleFail)
 		return
 	}

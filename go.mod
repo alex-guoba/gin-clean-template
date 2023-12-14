@@ -53,6 +53,7 @@ require (
 	github.com/prometheus/common v0.15.0 // indirect
 	github.com/prometheus/procfs v0.2.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.6 // indirect
+	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/afero v1.10.0 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

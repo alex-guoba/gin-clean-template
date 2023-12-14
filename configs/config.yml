@@ -6,9 +6,13 @@ Server:
 App:
   DefaultPageSize: 10
   MaxPageSize: 100
+Log:
   LogSavePath: storage/logs
-  LogFileName: app
-  LogFileExt: .log
+  LogFileName: app.log
+  Level: debug
+  MaxSize: 10
+  MaxBackups: 5
+  Compress: False
 Database:
   DBType: mysql
   Username: root

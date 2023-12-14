@@ -15,13 +15,19 @@ type AppSettingS struct {
 	DefaultPageSize       int
 	MaxPageSize           int
 	DefaultContextTimeout time.Duration
-	LogSavePath           string
-	LogFileName           string
-	LogFileExt            string
 	UploadSavePath        string
 	UploadServerURL       string
 	UploadImageMaxSize    int
 	UploadImageAllowExts  []string
+}
+
+type LogSettingS struct {
+	LogSavePath string
+	LogFileName string
+	MaxSize     int // MB
+	MaxBackups  int
+	Compress    bool
+	Level       string
 }
 
 type EmailSettingS struct {
