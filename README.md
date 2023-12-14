@@ -85,9 +85,17 @@ Storage layer, facing the logical expression of operations on storage objects, i
 
 
 ## TODO
-- [ ] Remove global: [Why is Global State so Evil?](https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil)
-- [ ] add cobra
 
+### Optimization
+- [ ] Remove global: [Why is Global State so Evil?](https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil)
+- [ ] Enable Docker 
+- [ ] setup command to init db, including faking data generated.
+
+### New features
+- [ ] Resource upload support, like S3, minio.
+- [ ] Auth with OIDC.
+- [ ] Enable Cache
+- [ ] Enable MQ
 
 ## Useful projects
 - [ddd-oriented-microservice](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/ddd-oriented-microservice)
