@@ -57,6 +57,7 @@ type DatabaseSettingS struct {
 	ParseTime    bool
 	MaxIdleConns int
 	MaxOpenConns int
+	MigrationURL string
 }
 
 type RatelimitSettingS struct {

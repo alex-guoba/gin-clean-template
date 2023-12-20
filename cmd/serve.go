@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -16,51 +17,59 @@ import (
 	"github.com/alex-guoba/gin-clean-template/pkg/setting"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-migrate/migrate/v4"
+
+	// for file migration source directory.
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var (
-	rootCmd = &cobra.Command{
-		Use:   "gin-clean-template",
-		Short: "A clean architecture template for Golang Gin services",
+var rootCmd = &cobra.Command{
+	Use:   "gin-clean-template",
+	Short: "A clean architecture template for Golang Gin services",
 
-		Run: func(cmd *cobra.Command, args []string) {
-			gin.SetMode(global.ServerSetting.RunMode)
+	Run: func(cmd *cobra.Command, args []string) {
+		gin.SetMode(global.ServerSetting.RunMode)
 
-			r := gin.New()
+		if err := dbInit(); err != nil {
+			log.Error("init db failed.", err)
+			return
+		}
 
-			r.Use(gin.Logger())
-			r.Use(gin.Recovery())
+		r := gin.New()
 
-			// global rate limit middleware
-			if global.RatelimitSetting.Enable {
-				limiter := ratelimit.New(global.RatelimitSetting.ConfigFile,
-					global.RatelimitSetting.CPULoadThresh, global.RatelimitSetting.CPULoadStrategy)
-				if limiter == nil {
-					log.Error("init rate limit middleware failed")
-					return
-				}
-				r.Use(limiter)
+		r.Use(gin.Logger())
+		r.Use(gin.Recovery())
+
+		// global rate limit middleware
+		if global.RatelimitSetting.Enable {
+			limiter := ratelimit.New(global.RatelimitSetting.ConfigFile,
+				global.RatelimitSetting.CPULoadThresh, global.RatelimitSetting.CPULoadStrategy)
+			if limiter == nil {
+				log.Error("init rate limit middleware failed")
+				return
 			}
+			r.Use(limiter)
+		}
 
-			routers.SetRouters(r)
+		routers.SetRouters(r)
 
-			// use http server
-			s := &http.Server{
-				Addr:           ":" + global.ServerSetting.HTTPPort,
-				Handler:        r,
-				ReadTimeout:    global.ServerSetting.ReadTimeout,
-				WriteTimeout:   global.ServerSetting.WriteTimeout,
-				MaxHeaderBytes: 1 << 20,
-			}
+		// use http server
+		s := &http.Server{
+			Addr:           ":" + global.ServerSetting.HTTPPort,
+			Handler:        r,
+			ReadTimeout:    global.ServerSetting.ReadTimeout,
+			WriteTimeout:   global.ServerSetting.WriteTimeout,
+			MaxHeaderBytes: 1 << 20,
+		}
 
-			log.Info("server started at " + s.Addr)
+		log.Info("server started at " + s.Addr)
 
-			_ = s.ListenAndServe()
-		},
-	}
-)
+		_ = s.ListenAndServe()
+	},
+}
 
 func Execute() error {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
@@ -74,6 +83,36 @@ func Execute() error {
 	return rootCmd.Execute()
 }
 
+func dbInit() error {
+	if err := setupDBEngine(); err != nil {
+		return err
+	}
+
+	// Run db migration
+	dsn := fmt.Sprintf("%s://%s:%s@tcp(%s)/%s?charset=%s&parseTime=%t&loc=Local",
+		global.DatabaseSetting.DBType,
+		global.DatabaseSetting.UserName,
+		global.DatabaseSetting.Password,
+		global.DatabaseSetting.Host,
+		global.DatabaseSetting.DBName,
+		global.DatabaseSetting.Charset,
+		global.DatabaseSetting.ParseTime,
+	)
+	migration, err := migrate.New(global.DatabaseSetting.MigrationURL, dsn)
+	if err != nil {
+		log.Error("migration init error.", err)
+		return err
+	}
+
+	if err = migration.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Error("failed to run migrate up.", err)
+		return err
+	}
+
+	log.Info("db migrated successfully.")
+	return nil
+}
+
 func init() {
 	// cobra.OnInitialize(initConfig)
 
@@ -82,10 +121,6 @@ func init() {
 
 	if err := setupSetting(); err != nil {
 		log.Fatalf("init.setupSetting err: %v", err)
-	}
-
-	if err := setupDBEngine(); err != nil {
-		log.Fatalf("init.setupDBEngine err: %v", err)
 	}
 }
 

@@ -24,6 +24,7 @@ Database:
   ParseTime: True
   MaxIdleConns: 10
   MaxOpenConns: 30
+  MigrationURL: "file://db/migration"
 Ratelimit:
   Enable: true
   ConfigFile: sentinel.yml

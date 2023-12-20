@@ -18,16 +18,27 @@ This is an example of implementation of Gin framework (Golang) service.
 
 $ go build
 
+# install mysql, see Makefile
+
 # Run app with defualt configuaration in configs/config.yml
 $ ./gin-clean-template
 ```
 
 ## Features
 
+- [x] DB migration
+Support database schema migration from migration source('db/migration'). see [migrate](https://github.com/golang-migrate/migrate) for more details.
+Use this command to generate some seed data.
+
+``` shell
+» ./gin-clean-template seed --count 100
+```
+
 - [x] Overload Protection
 With the overload protection capabilities of [sentinel](https://github.com/alibaba/sentinel-golang)，system adaptive overload protection capabilities are implemented.
 
 - [x] Load Testing
+
 ``` shell
 » ./scripts/load-testing/start_load_testing.sh
 
