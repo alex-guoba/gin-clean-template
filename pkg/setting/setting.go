@@ -1,40 +1,103 @@
 package setting
 
 import (
-	"github.com/fsnotify/fsnotify"
+	"strings"
+	"time"
+
 	"github.com/spf13/viper"
 )
 
-type Setting struct {
-	vp *viper.Viper
+// type EmailSettingS struct {
+// 	Host     string
+// 	Port     int
+// 	UserName string
+// 	Password string
+// 	IsSSL    bool
+// 	From     string
+// 	To       []string
+// }
+
+// type JWTSettingS struct {
+// 	Secret string
+// 	Issuer string
+// 	Expire time.Duration
+// }
+
+type ServerSettingS struct {
+	RunMode      string        `mapstructure:"RunMode"`
+	HTTPPort     string        `mapstructure:"HTTPPort"`
+	ReadTimeout  time.Duration `mapstructure:"ReadTimeout"`
+	WriteTimeout time.Duration `mapstructure:"WriteTimeout"`
 }
 
-func NewSetting(configs ...string) (*Setting, error) {
-	vp := viper.New()
-
-	vp.SetConfigName("config")
-	vp.AddConfigPath("configs/") // default config path
-	for _, config := range configs {
-		if config != "" {
-			vp.AddConfigPath(config)
-		}
-	}
-	vp.SetConfigType("yaml")
-
-	if err := vp.ReadInConfig(); err != nil {
-		return nil, err
-	}
-
-	s := &Setting{vp}
-	s.WatchSettingChange()
-	return s, nil
+type AppSettingS struct {
+	DefaultPageSize       int           `mapstructure:"DefaultPageSize"`
+	MaxPageSize           int           `mapstructure:"MaxPageSize"`
+	DefaultContextTimeout time.Duration `mapstructure:"DefaultContextTimeout"`
+	UploadSavePath        string        `mapstructure:"UploadSavePath"`
+	UploadServerURL       string        `mapstructure:"UploadServerURL"`
+	UploadImageMaxSize    int           `mapstructure:"UploadImageMaxSize"`
 }
 
-func (s *Setting) WatchSettingChange() {
-	go func() {
-		s.vp.WatchConfig()
-		s.vp.OnConfigChange(func(in fsnotify.Event) {
-			_ = s.ReloadAllSection()
-		})
-	}()
+type LogSettingS struct {
+	LogSavePath string `mapstructure:"LogSavePath"`
+	LogFileName string `mapstructure:"LogFileName"`
+	MaxSize     int    `mapstructure:"MaxSize"`
+	MaxBackups  int    `mapstructure:"MaxBackups"`
+	Compress    bool   `mapstructure:"Compress"`
+	Level       string `mapstructure:"Level"`
+}
+
+type DatabaseSettingS struct {
+	DBType       string `mapstructure:"DBType"`
+	UserName     string `mapstructure:"UserName"`
+	Password     string `mapstructure:"Password"`
+	Host         string `mapstructure:"Host"`
+	DBName       string `mapstructure:"DBName"`
+	Charset      string `mapstructure:"Charset"`
+	ParseTime    bool   `mapstructure:"ParseTime"`
+	MaxIdleConns int    `mapstructure:"MaxIdleConns"`
+	MaxOpenConns int    `mapstructure:"MaxOpenConns"`
+	MigrationURL string `mapstructure:"MigrationURL"`
+}
+
+type RatelimitSettingS struct {
+	Enable          bool    `mapstructure:"Enable"`
+	ConfigFile      string  `mapstructure:"ConfigFile"`
+	CPULoadThresh   float64 `mapstructure:"CPULoadThresh"`
+	CPULoadStrategy int     `mapstructure:"CPULoadStrategy"`
+}
+
+// UnmarshalKey / Sub only uses read config, neglects environment variables
+// https://github.com/spf13/viper/issues/1012
+type Configuration struct {
+	Server    ServerSettingS    `mapstructure:"Server"`
+	App       AppSettingS       `mapstructure:"App"`
+	Log       LogSettingS       `mapstructure:"Log"`
+	Database  DatabaseSettingS  `mapstructure:"Database"`
+	Ratelimit RatelimitSettingS `mapstructure:"Ratelimit"`
+}
+
+func LoadConfig(cfg *Configuration) error {
+	viper.AddConfigPath("configs/")
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(`.`, `_`))
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
+	err = viper.Unmarshal(cfg)
+	if err != nil {
+		return err
+	}
+
+	// https://adam-p.ca/blog/2022/01/golang-http-server-timeouts/
+	cfg.Server.ReadTimeout *= time.Second
+	cfg.Server.WriteTimeout *= time.Second
+
+	return nil
 }

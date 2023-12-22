@@ -3,6 +3,8 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/alex-guoba/gin-clean-template/internal/service"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
 	"github.com/alex-guoba/gin-clean-template/pkg/convert"
@@ -107,6 +109,11 @@ func (art Article) List(c *gin.Context) {
 		response.ToErrorResponse(errcode.ErrorGetArticlesFail)
 		return
 	}
+
+	for _, article := range articles {
+		log.Info(article)
+	}
+	log.Info("total num: ", totalRows)
 
 	response.ToResponseList(articles, totalRows)
 }

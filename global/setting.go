@@ -5,9 +5,5 @@ import (
 )
 
 var (
-	ServerSetting    *setting.ServerSettingS
-	AppSetting       *setting.AppSettingS
-	LogSetting       *setting.LogSettingS
-	DatabaseSetting  *setting.DatabaseSettingS
-	RatelimitSetting *setting.RatelimitSettingS
+	Config setting.Configuration
 )

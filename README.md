@@ -18,10 +18,15 @@ This is an example of implementation of Gin framework (Golang) service.
 
 $ go build
 
-# install mysql, see Makefile
+# install mysql, see Makefile or docker file
+$ make mysql_install
+$ make db_create
 
 # Run app with defualt configuaration in configs/config.yml
 $ ./gin-clean-template
+
+# Also support docker to startup
+$ docker-compose up
 ```
 
 ## Features

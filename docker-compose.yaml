@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=helloworld
+      - MYSQL_DATABASE=blog_service
+      - TZ=Asia/Shanghai
+    ports:
+      - "3306:3306"
+  services:
+    image: gin-clean-template:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gin-clean-template
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_HOST=mysql
+      - DATABASE_PASSWORD=helloworld
+      - DATABASE_DBNAME=blog_service
+      - SERVER_HTTPPORT=8080
+    depends_on:
+      - mysql
+    entrypoint:
+      [
+        "/app/scripts/startup/wait-for.sh",
+        "mysql:3306",
+        "--",
+        "/app/gin-clean-template"
+      ]

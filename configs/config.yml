@@ -4,12 +4,12 @@ Server:
   ReadTimeout: 60
   WriteTimeout: 60
 App:
-  DefaultPageSize: 10
-  MaxPageSize: 100
+  DefaultPageSize: 5
+  MaxPageSize: 20
 Log:
   LogSavePath: storage/logs
   LogFileName: app.log
-  Level: debug
+  Level: info
   MaxSize: 10
   MaxBackups: 5
   Compress: False
@@ -19,14 +19,13 @@ Database:
   Password: helloworld
   Host: 127.0.0.1:3306
   DBName: blog_service
-  TablePrefix: blog_
   Charset: utf8
   ParseTime: True
   MaxIdleConns: 10
   MaxOpenConns: 30
   MigrationURL: "file://db/migration"
 Ratelimit:
-  Enable: true
+  Enable: True
   ConfigFile: sentinel.yml
   CPULoadThresh: 0
   CPULoadStrategy: -1 # 0: BBR, -1: NoAdaptive

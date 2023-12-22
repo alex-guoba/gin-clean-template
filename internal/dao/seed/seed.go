@@ -15,7 +15,6 @@ func Seed(engine *gorm.DB, count int) error {
 
 func seedArticleTag(engine *gorm.DB, count int) error {
 	for i := 0; i < count; i++ {
-
 		model := dao.Model{CreatedBy: "gofakeit"}
 
 		article := dao.ArticleModel{

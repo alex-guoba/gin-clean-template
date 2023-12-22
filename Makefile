@@ -3,6 +3,8 @@ DBSECRET=helloworld
 DBNAME=blog_service
 DB_URL=mysql://$(DBUSER):$(DBSECRET)@localhost:3306/$(DBNAME)?sslmode=disable
 
+.DEFAULT_GOAL := lint
+
 # Start mysql container
 mysql_install:
 	docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=$(DBSECRET) mysql
