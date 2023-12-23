@@ -6,16 +6,19 @@ import (
 	"github.com/alex-guoba/gin-clean-template/internal/dao"
 	"github.com/alex-guoba/gin-clean-template/internal/entity"
 	"github.com/alex-guoba/gin-clean-template/pkg/errcode"
+
+	"gorm.io/gorm"
 )
 
 type TagDomain struct {
 	ctx context.Context
+	db  *gorm.DB
 	dao dao.TagDao
 }
 
-func NewTagDomain(ctx context.Context) *TagDomain {
-	d := &TagDomain{ctx: ctx}
-	d.dao = dao.NewTagDao()
+func NewTagDomain(ctx context.Context, db *gorm.DB) *TagDomain {
+	d := &TagDomain{ctx: ctx, db: db}
+	d.dao = dao.NewTagDao(db)
 	return d
 }
 
@@ -62,7 +65,7 @@ func (d *TagDomain) UpdateTag(id uint32, name string, state uint8, modifiedBy st
 func (d *TagDomain) DeleteTag(tagID uint32, force bool) error {
 	// From a domain calling other domain methods to fulfill the requirements of the business logic
 	if !force {
-		ad := NewArticleDomain(d.ctx)
+		ad := NewArticleDomain(d.ctx, d.db)
 		if cnt, err := ad.countArticleByTagID(tagID); err != nil {
 			return err
 		} else if cnt > 0 {

@@ -2,16 +2,16 @@ package signals
 
 import (
 	"context"
-	"net/http"
 	"time"
 
 	"github.com/alex-guoba/gin-clean-template/internal/dao"
+	"github.com/alex-guoba/gin-clean-template/server"
+
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 type Shutdown struct {
-	// logger *zap.Logger
 	// pool                  *redis.Pool
 	// tracerProvider        *sdktrace.TracerProvider
 	serverShutdownTimeout time.Duration
@@ -26,7 +26,7 @@ func NewShutdown(serverShutdownTimeout time.Duration) (*Shutdown, error) {
 	return srv, nil
 }
 
-func (s *Shutdown) Graceful(stopCh <-chan struct{}, httpServer *http.Server, engine *gorm.DB) {
+func (s *Shutdown) Graceful(stopCh <-chan struct{}, svr *server.Server, engine *gorm.DB) {
 	ctx := context.Background()
 
 	// wait for the server to gracefully terminate
@@ -66,10 +66,8 @@ func (s *Shutdown) Graceful(stopCh <-chan struct{}, httpServer *http.Server, eng
 	// }
 
 	// determine if the http server was started
-	if httpServer != nil {
-		if err := httpServer.Shutdown(ctx); err != nil {
-			log.Warn("HTTP server graceful shutdown failed", err)
-		}
+	if err := svr.Shutdown(ctx); err != nil {
+		log.Warn("HTTP server graceful shutdown failed", err)
 	}
 
 	if engine != nil {

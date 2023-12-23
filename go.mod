@@ -5,7 +5,6 @@ go 1.21.1
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/alibaba/sentinel-golang v1.0.4
-	github.com/fsnotify/fsnotify v1.6.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.16.0
@@ -16,6 +15,7 @@ require (
 )
 
 require (
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect

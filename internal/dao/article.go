@@ -3,7 +3,6 @@ package dao
 import (
 	"gorm.io/gorm"
 
-	"github.com/alex-guoba/gin-clean-template/global"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
 )
 
@@ -22,8 +21,8 @@ type ArticleDao interface {
 	GetArticleListByTagID(id uint32, state uint8, page, pageSize int) ([]*ArticleTagRow, error)
 }
 
-func NewArticleDaoDB() *ArticleDaoDB {
-	return &ArticleDaoDB{engine: global.DBEngine}
+func NewArticleDaoDB(db *gorm.DB) *ArticleDaoDB {
+	return &ArticleDaoDB{engine: db}
 }
 
 func (d *ArticleDaoDB) CreateArticle(title string, desc string, content string, image string,

@@ -105,11 +105,12 @@ Storage layer, facing the logical expression of operations on storage objects, i
 ## TODO
 
 ### Optimization
-- [ ] Remove global: [Why is Global State so Evil?](https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil)
+- [x] Remove global: [Why is Global State so Evil?](https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil)
 - [x] Enable Docker 
 - [x] setup command to init db, including faking data generated.
 
 ### New features
+- [ ] Swagger docs
 - [ ] Resource upload support, like S3, minio.
 - [ ] Auth with OIDC.
 - [ ] Enable Cache

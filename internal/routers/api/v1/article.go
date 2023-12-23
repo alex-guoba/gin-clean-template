@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
 	log "github.com/sirupsen/logrus"
 
@@ -10,12 +11,19 @@ import (
 	"github.com/alex-guoba/gin-clean-template/pkg/convert"
 	"github.com/alex-guoba/gin-clean-template/pkg/errcode"
 	"github.com/alex-guoba/gin-clean-template/pkg/logger"
+	"github.com/alex-guoba/gin-clean-template/pkg/setting"
 )
 
-type Article struct{}
+type Article struct {
+	db  *gorm.DB
+	cfg *setting.Configuration
+}
 
-func NewArticle() Article {
-	return Article{}
+func NewArticle(db *gorm.DB, cfg *setting.Configuration) Article {
+	return Article{
+		db:  db,
+		cfg: cfg,
+	}
 }
 
 // @Summary 创建文章
@@ -31,14 +39,14 @@ func NewArticle() Article {
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles [post].
-func (art Article) Create(c *gin.Context) {
+func (art *Article) Create(c *gin.Context) {
 	param := service.CreateArticleRequest{}
 	response := app.NewResponse(c)
 	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
-	svc := service.NewArticleService(c.Request.Context())
+	svc := service.NewArticleService(c.Request.Context(), art.db)
 	err := svc.CreateArticle(&param)
 	if err != nil {
 		logger.WithTrace(c).Errorf("svc.CreateArticle err: %v", err)
@@ -56,14 +64,14 @@ func (art Article) Create(c *gin.Context) {
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles/{id} [get].
-func (art Article) Get(c *gin.Context) {
+func (art *Article) Get(c *gin.Context) {
 	param := service.ArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
 	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
-	svc := service.NewArticleService(c.Request.Context())
+	svc := service.NewArticleService(c.Request.Context(), art.db)
 	article, err := svc.GetArticle(&param)
 	if err != nil {
 		logger.WithTrace(c).Errorf("svc.GetArticle err: %v", err)
@@ -85,15 +93,18 @@ func (art Article) Get(c *gin.Context) {
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles [get].
-func (art Article) List(c *gin.Context) {
+func (art *Article) List(c *gin.Context) {
 	param := service.ArticleListRequest{}
 	response := app.NewResponse(c)
 	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
-	svc := service.NewArticleService(c.Request.Context())
-	pager := app.Pager{Page: app.GetPage(c), PageSize: app.GetPageSize(c)}
+	svc := service.NewArticleService(c.Request.Context(), art.db)
+	pager := app.Pager{
+		Page:     app.GetPage(c),
+		PageSize: app.GetPageSize(c, art.cfg.App.DefaultPageSize, art.cfg.App.MaxPageSize),
+	}
 	articles, totalRows, err := svc.GetArticleList(&param, &pager)
 	if err != nil {
 		logger.WithTrace(c).Errorf("svc.GetArticleList err: %v", err)
@@ -106,7 +117,7 @@ func (art Article) List(c *gin.Context) {
 	}
 	log.Info("total num: ", totalRows)
 
-	response.ToResponseList(articles, totalRows)
+	response.ToResponseList(articles, totalRows, pager.Page, pager.PageSize)
 }
 
 // @Summary 更新文章
@@ -121,14 +132,14 @@ func (art Article) List(c *gin.Context) {
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles/{id} [put].
-func (art Article) Update(c *gin.Context) {
+func (art *Article) Update(c *gin.Context) {
 	param := service.UpdateArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
 	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
-	svc := service.NewArticleService(c.Request.Context())
+	svc := service.NewArticleService(c.Request.Context(), art.db)
 	err := svc.UpdateArticle(&param)
 	if err != nil {
 		logger.WithTrace(c).Errorf("svc.UpdateArticle err: %v", err)
@@ -146,14 +157,14 @@ func (art Article) Update(c *gin.Context) {
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles/{id} [delete].
-func (art Article) Delete(c *gin.Context) {
+func (art *Article) Delete(c *gin.Context) {
 	param := service.DeleteArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
 	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
-	svc := service.NewArticleService(c.Request.Context())
+	svc := service.NewArticleService(c.Request.Context(), art.db)
 	err := svc.DeleteArticle(&param)
 	if err != nil {
 		logger.WithTrace(c).Errorf("svc.DeleteArticle err: %v", err)

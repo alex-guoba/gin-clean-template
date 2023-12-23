@@ -5,6 +5,8 @@ import (
 
 	"github.com/alex-guoba/gin-clean-template/internal/dao"
 	"github.com/alex-guoba/gin-clean-template/internal/entity"
+
+	"gorm.io/gorm"
 )
 
 type ArticleDomain struct {
@@ -14,11 +16,11 @@ type ArticleDomain struct {
 	artileTagDao dao.ArticleTagDao
 }
 
-func NewArticleDomain(ctx context.Context) *ArticleDomain {
+func NewArticleDomain(ctx context.Context, db *gorm.DB) *ArticleDomain {
 	d := &ArticleDomain{ctx: ctx}
-	d.tagDao = dao.NewTagDao()
-	d.articleDao = dao.NewArticleDaoDB()
-	d.artileTagDao = dao.NewArticleTagDao()
+	d.tagDao = dao.NewTagDao(db)
+	d.articleDao = dao.NewArticleDaoDB(db)
+	d.artileTagDao = dao.NewArticleTagDao(db)
 	return d
 }
 

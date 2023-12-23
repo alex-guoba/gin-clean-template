@@ -3,7 +3,6 @@ package app
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/alex-guoba/gin-clean-template/global"
 	"github.com/alex-guoba/gin-clean-template/pkg/convert"
 )
 
@@ -16,13 +15,13 @@ func GetPage(c *gin.Context) int {
 	return page
 }
 
-func GetPageSize(c *gin.Context) int {
+func GetPageSize(c *gin.Context, defaultSize int, maxSize int) int {
 	pageSize := convert.StrTo(c.Query("page_size")).MustInt()
 	if pageSize <= 0 {
-		return global.Config.App.DefaultPageSize
+		return defaultSize
 	}
-	if pageSize > global.Config.App.MaxPageSize {
-		return global.Config.App.MaxPageSize
+	if pageSize > maxSize {
+		return maxSize
 	}
 
 	return pageSize

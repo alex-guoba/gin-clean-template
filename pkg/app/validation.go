@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/alex-guoba/gin-clean-template/pkg/errcode"
 	"github.com/alex-guoba/gin-clean-template/pkg/logger"
+
 	"github.com/gin-gonic/gin"
 )
 

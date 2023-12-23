@@ -3,6 +3,8 @@ DBSECRET=helloworld
 DBNAME=blog_service
 DB_URL=mysql://$(DBUSER):$(DBSECRET)@localhost:3306/$(DBNAME)?sslmode=disable
 
+VERSION:=$(shell grep 'VERSION' pkg/version/version.go | awk '{ print $$4 }' | tr -d '"')
+
 .DEFAULT_GOAL := lint
 
 # Start mysql container
@@ -20,5 +22,12 @@ migration_new:
 # lint source file
 lint:
 	golangci-lint run
+
+
+swagger:
+	go install github.com/swaggo/swag/cmd/swag@latest
+	go get github.com/swaggo/swag/gen@latest
+	go get github.com/swaggo/swag/cmd/swag@latest
+	cd pkg/api && $$(go env GOPATH)/bin/swag init -g server.go
 
 .PHONY: mysql_install db_create lint

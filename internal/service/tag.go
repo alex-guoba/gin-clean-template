@@ -6,6 +6,8 @@ import (
 	"github.com/alex-guoba/gin-clean-template/internal/domain"
 	"github.com/alex-guoba/gin-clean-template/internal/entity"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
+
+	"gorm.io/gorm"
 )
 
 // for validateor.
@@ -44,12 +46,13 @@ type DeleteTagRequest struct {
 // service.
 type TagService struct {
 	ctx    context.Context
+	db     *gorm.DB
 	domain *domain.TagDomain
 }
 
-func NewTagService(ctx context.Context) *TagService {
-	svc := &TagService{ctx: ctx}
-	svc.domain = domain.NewTagDomain(ctx)
+func NewTagService(ctx context.Context, db *gorm.DB) *TagService {
+	svc := &TagService{ctx: ctx, db: db}
+	svc.domain = domain.NewTagDomain(ctx, db)
 	return svc
 }
 

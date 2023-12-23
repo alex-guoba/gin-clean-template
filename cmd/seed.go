@@ -4,9 +4,9 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/alex-guoba/gin-clean-template/global"
 	"github.com/alex-guoba/gin-clean-template/internal/dao"
 	"github.com/alex-guoba/gin-clean-template/internal/dao/seed"
+	"github.com/alex-guoba/gin-clean-template/pkg/setting"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -21,14 +21,20 @@ var seedCmd = &cobra.Command{
 	Use:   "seed",
 	Short: "Seed blog service database",
 	Run: func(cmd *cobra.Command, args []string) {
-		var err error
-		global.DBEngine, err = dao.NewDBEngine(&global.Config.Database)
+		var config setting.Configuration
+
+		if err := setting.LoadConfig(&config); err != nil {
+			log.Error("loading config file failed.", err)
+			return
+		}
+
+		engine, err := dao.NewDBEngine(&config.Database)
 		if err != nil {
 			log.Error("init db error. ", err)
 			return
 		}
 
-		if err = seed.Seed(global.DBEngine, seedCount); err != nil {
+		if err = seed.Seed(engine, seedCount); err != nil {
 			log.Error("seed db error. ", err)
 			return
 		}

@@ -6,6 +6,8 @@ import (
 	"github.com/alex-guoba/gin-clean-template/internal/domain"
 	"github.com/alex-guoba/gin-clean-template/internal/entity"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
+
+	"gorm.io/gorm"
 )
 
 type ArticleRequest struct {
@@ -46,11 +48,15 @@ type DeleteArticleRequest struct {
 
 type ArticleService struct {
 	ctx    context.Context
+	db     *gorm.DB
 	domain *domain.ArticleDomain
 }
 
-func NewArticleService(ctx context.Context) *ArticleService {
-	return &ArticleService{ctx: ctx, domain: domain.NewArticleDomain(ctx)}
+func NewArticleService(ctx context.Context, db *gorm.DB) *ArticleService {
+	return &ArticleService{
+		ctx:    ctx,
+		db:     db,
+		domain: domain.NewArticleDomain(ctx, db)}
 }
 
 func (svc *ArticleService) GetArticle(param *ArticleRequest) (*entity.ArticleEntity, error) {

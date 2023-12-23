@@ -34,12 +34,12 @@ func (r *Response) ToResponse(data any) {
 	r.Ctx.JSON(http.StatusOK, data)
 }
 
-func (r *Response) ToResponseList(list any, totalRows int) {
+func (r *Response) ToResponseList(list any, totalRows int, page int, pageSize int) {
 	r.Ctx.JSON(http.StatusOK, gin.H{
 		"list": list,
 		"pager": Pager{
-			Page:      GetPage(r.Ctx),
-			PageSize:  GetPageSize(r.Ctx),
+			Page:      page,
+			PageSize:  pageSize,
 			TotalRows: totalRows,
 		},
 	})

@@ -5,6 +5,7 @@ import (
 
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
 	"github.com/alex-guoba/gin-clean-template/pkg/convert"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,7 +22,7 @@ type DelayRequest struct {
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /public/delay/{seconds} [get]
-func (art *Delay) DelayHandler(c *gin.Context) {
+func (*Delay) DelayHandler(c *gin.Context) {
 	param := DelayRequest{Seconds: convert.StrTo(c.Param("seconds")).MustInt()}
 	response := app.NewResponse(c)
 	if app.Validation(c, &param, response) != nil {

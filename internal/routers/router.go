@@ -3,13 +3,15 @@ package routers
 import (
 	v1 "github.com/alex-guoba/gin-clean-template/internal/routers/api/v1"
 	"github.com/alex-guoba/gin-clean-template/internal/routers/public"
+	"github.com/alex-guoba/gin-clean-template/pkg/setting"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func SetRouters(r *gin.Engine) {
-	article := v1.NewArticle()
-	tag := v1.NewTag()
+func SetRouters(r *gin.Engine, cfg *setting.Configuration, db *gorm.DB) {
+	article := v1.NewArticle(db, cfg)
+	tag := v1.NewTag(db, cfg)
 	apiv1 := r.Group("/api/v1")
 	{
 		// Create tag

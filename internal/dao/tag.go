@@ -3,7 +3,6 @@ package dao
 import (
 	"gorm.io/gorm"
 
-	"github.com/alex-guoba/gin-clean-template/global"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
 )
 
@@ -26,8 +25,8 @@ type TagDao interface {
 	DeleteTag(id uint32) error
 }
 
-func NewTagDao() *TagDaoDB {
-	return &TagDaoDB{engine: global.DBEngine}
+func NewTagDao(db *gorm.DB) *TagDaoDB {
+	return &TagDaoDB{engine: db}
 }
 
 func (d *TagDaoDB) GetTag(id uint32, state uint8) (TagModel, error) {

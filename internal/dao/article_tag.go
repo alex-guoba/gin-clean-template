@@ -1,8 +1,6 @@
 package dao
 
 import (
-	"github.com/alex-guoba/gin-clean-template/global"
-
 	"gorm.io/gorm"
 )
 
@@ -19,8 +17,8 @@ type ArticleTagDao interface {
 	DeleteArticleTag(articleID uint32) error
 }
 
-func NewArticleTagDao() *ArticleTagDaoDB {
-	return &ArticleTagDaoDB{engine: global.DBEngine}
+func NewArticleTagDao(db *gorm.DB) *ArticleTagDaoDB {
+	return &ArticleTagDaoDB{engine: db}
 }
 
 // TODO: combine single query and batch query.
