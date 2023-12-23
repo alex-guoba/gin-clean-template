@@ -2,6 +2,7 @@ package routers
 
 import (
 	v1 "github.com/alex-guoba/gin-clean-template/internal/routers/api/v1"
+	"github.com/alex-guoba/gin-clean-template/internal/routers/public"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,5 +33,11 @@ func SetRouters(r *gin.Engine) {
 		apiv1.DELETE("/articles/:id", article.Delete)
 
 		// Add other router if necessary
+	}
+
+	gPub := r.Group("/public")
+	{
+		delay := &public.Delay{}
+		gPub.GET("/delay/:seconds", delay.DelayHandler)
 	}
 }

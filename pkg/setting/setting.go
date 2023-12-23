@@ -33,10 +33,12 @@ type ServerSettingS struct {
 type AppSettingS struct {
 	DefaultPageSize       int           `mapstructure:"DefaultPageSize"`
 	MaxPageSize           int           `mapstructure:"MaxPageSize"`
-	DefaultContextTimeout time.Duration `mapstructure:"DefaultContextTimeout"`
-	UploadSavePath        string        `mapstructure:"UploadSavePath"`
-	UploadServerURL       string        `mapstructure:"UploadServerURL"`
-	UploadImageMaxSize    int           `mapstructure:"UploadImageMaxSize"`
+	ServerShutdownTimeout time.Duration `mapstructure:"ServerShutdownTimeout"`
+
+	// DefaultContextTimeout time.Duration `mapstructure:"DefaultContextTimeout"`
+	// UploadSavePath        string        `mapstructure:"UploadSavePath"`
+	// UploadServerURL       string        `mapstructure:"UploadServerURL"`
+	// UploadImageMaxSize    int           `mapstructure:"UploadImageMaxSize"`
 }
 
 type LogSettingS struct {
@@ -94,10 +96,6 @@ func LoadConfig(cfg *Configuration) error {
 	if err != nil {
 		return err
 	}
-
-	// https://adam-p.ca/blog/2022/01/golang-http-server-timeouts/
-	cfg.Server.ReadTimeout *= time.Second
-	cfg.Server.WriteTimeout *= time.Second
 
 	return nil
 }

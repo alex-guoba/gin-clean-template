@@ -1,11 +1,12 @@
 Server:
   RunMode: debug
   HTTPPort: 8000
-  ReadTimeout: 60
-  WriteTimeout: 60
+  ReadTimeout: 30s
+  WriteTimeout: 30s
 App:
   DefaultPageSize: 5
   MaxPageSize: 20
+  ServerShutdownTimeout: 10s
 Log:
   LogSavePath: storage/logs
   LogFileName: app.log

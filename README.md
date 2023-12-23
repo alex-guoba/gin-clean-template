@@ -71,6 +71,8 @@ Bucket           #       %       Histogram
 [1s,     +Inf]   1       0.00%
 ```
 
+- [x] Graceful shutdown on interrupt signals
+
 ## Layered Architecture 
 
 There are 4 layers in this project:
@@ -104,8 +106,8 @@ Storage layer, facing the logical expression of operations on storage objects, i
 
 ### Optimization
 - [ ] Remove global: [Why is Global State so Evil?](https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil)
-- [ ] Enable Docker 
-- [ ] setup command to init db, including faking data generated.
+- [x] Enable Docker 
+- [x] setup command to init db, including faking data generated.
 
 ### New features
 - [ ] Resource upload support, like S3, minio.

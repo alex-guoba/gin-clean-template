@@ -6,6 +6,8 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+var logger *lumberjack.Logger
+
 func SetupLogger(filename string, maxsize int, maxbackup int, compress bool, level string) {
 	logger := &lumberjack.Logger{
 		Filename:   filename,
@@ -23,6 +25,10 @@ func SetupLogger(filename string, maxsize int, maxbackup int, compress bool, lev
 
 	// use lumberjack to write to implement rotation.
 	log.SetOutput(logger)
+}
+
+func Close() {
+	logger.Close()
 }
 
 func WithTrace(ctx *gin.Context) *log.Entry {

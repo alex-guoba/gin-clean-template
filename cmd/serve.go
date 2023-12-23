@@ -14,6 +14,7 @@ import (
 	"github.com/alex-guoba/gin-clean-template/internal/routers"
 	"github.com/alex-guoba/gin-clean-template/pkg/logger"
 	"github.com/alex-guoba/gin-clean-template/pkg/setting"
+	"github.com/alex-guoba/gin-clean-template/pkg/signals"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
@@ -32,45 +33,29 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		gin.SetMode(global.Config.Server.RunMode)
 
+		// init logger
 		logger.SetupLogger(
 			filepath.Join(global.Config.Log.LogSavePath, global.Config.Log.LogFileName),
 			global.Config.Log.MaxSize, global.Config.Log.MaxBackups, global.Config.Log.Compress,
 			global.Config.Log.Level)
 
+		// init db
 		if err := dbInit(&global.Config.Database); err != nil {
 			log.Error("init db failed.", err)
 			return
 		}
 
-		r := gin.New()
-
-		r.Use(gin.Logger())
-		r.Use(gin.Recovery())
-		routers.SetRouters(r)
-
-		// global rate limit middleware
-		if global.Config.Ratelimit.Enable {
-			limiter := ratelimit.New(global.Config.Ratelimit.ConfigFile,
-				global.Config.Ratelimit.CPULoadThresh, global.Config.Ratelimit.CPULoadStrategy)
-			if limiter == nil {
-				log.Error("init rate limit middleware failed")
-				return
-			}
-			r.Use(limiter)
+		// start http server
+		srv, err := startHttpServer()
+		if err != nil {
+			log.Error("start http server failed.", err)
+			return
 		}
 
-		// use http server
-		s := &http.Server{
-			Addr:           ":" + global.Config.Server.HTTPPort,
-			Handler:        r,
-			ReadTimeout:    global.Config.Server.ReadTimeout,
-			WriteTimeout:   global.Config.Server.WriteTimeout,
-			MaxHeaderBytes: 1 << 20,
-		}
-
-		log.Info("server started at ", s.Addr)
-
-		_ = s.ListenAndServe()
+		// graceful shutdown
+		stopCh := signals.SetupSignalHandler()
+		sd, _ := signals.NewShutdown(global.Config.App.ServerShutdownTimeout)
+		sd.Graceful(stopCh, srv, global.DBEngine)
 	},
 }
 
@@ -80,8 +65,46 @@ func Execute() error {
 	return rootCmd.Execute()
 }
 
+func startHttpServer() (*http.Server, error) {
+	r := gin.New()
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
+
+	// global rate limit middleware
+	if global.Config.Ratelimit.Enable {
+		limiter := ratelimit.New(global.Config.Ratelimit.ConfigFile,
+			global.Config.Ratelimit.CPULoadThresh, global.Config.Ratelimit.CPULoadStrategy)
+		if limiter == nil {
+			log.Error("init rate limit middleware failed, ignored")
+		} else {
+			r.Use(limiter)
+		}
+	}
+	routers.SetRouters(r)
+
+	// Timeout: https://adam-p.ca/blog/2022/01/golang-http-server-timeouts/
+	srv := &http.Server{
+		Addr:           ":" + global.Config.Server.HTTPPort,
+		Handler:        r,
+		ReadTimeout:    global.Config.Server.ReadTimeout,
+		WriteTimeout:   global.Config.Server.WriteTimeout,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	go func() {
+		log.Info("Starting HTTP Server at :", global.Config.Server.HTTPPort)
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatal("HTTP server expcetpion. ", err)
+		}
+	}()
+
+	return srv, nil
+}
+
 func dbInit(dbconfig *setting.DatabaseSettingS) error {
-	if err := setupDBEngine(); err != nil {
+	var err error
+	global.DBEngine, err = dao.NewDBEngine(&global.Config.Database)
+	if err != nil {
 		return err
 	}
 
@@ -119,14 +142,4 @@ func init() {
 	if err := setting.LoadConfig(&global.Config); err != nil {
 		log.Fatal("loading config file failed.", err)
 	}
-}
-
-func setupDBEngine() error {
-	var err error
-	global.DBEngine, err = dao.NewDBEngine(&global.Config.Database)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

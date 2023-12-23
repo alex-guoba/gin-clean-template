@@ -16,15 +16,6 @@ func NewTag() Tag {
 	return Tag{}
 }
 
-func (Tag) checkParams(c *gin.Context, param any, response *app.Response) error {
-	if err := c.ShouldBind(param); err != nil {
-		logger.WithTrace(c).Errorf("param errs: %v", err)
-		response.ToErrorResponse(errcode.InvalidParams.WithDetails(err.Error()))
-		return err
-	}
-	return nil
-}
-
 // @Summary 获取多个标签
 // @Produce  json
 // @Param name query string false "标签名称" maxlength(100)
@@ -38,7 +29,7 @@ func (Tag) checkParams(c *gin.Context, param any, response *app.Response) error 
 func (t Tag) List(c *gin.Context) {
 	param := service.TagListRequest{}
 	response := app.NewResponse(c)
-	if t.checkParams(c, &param, response) != nil {
+	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
@@ -67,7 +58,7 @@ func (t Tag) List(c *gin.Context) {
 func (t Tag) Create(c *gin.Context) {
 	param := service.CreateTagRequest{}
 	response := app.NewResponse(c)
-	if t.checkParams(c, &param, response) != nil {
+	if app.Validation(c, &param, response) != nil {
 		return
 	}
 	svc := service.NewTagService(c.Request.Context())
@@ -95,7 +86,7 @@ func (t Tag) Update(c *gin.Context) {
 		ID: convert.StrTo(c.Param("id")).MustUInt32(),
 	}
 	response := app.NewResponse(c)
-	if t.checkParams(c, &param, response) != nil {
+	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
@@ -119,7 +110,7 @@ func (t Tag) Update(c *gin.Context) {
 func (t Tag) Delete(c *gin.Context) {
 	param := service.DeleteTagRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
-	if t.checkParams(c, &param, response) != nil {
+	if app.Validation(c, &param, response) != nil {
 		return
 	}
 

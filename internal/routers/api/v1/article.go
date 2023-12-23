@@ -18,15 +18,6 @@ func NewArticle() Article {
 	return Article{}
 }
 
-func (Article) checkParams(c *gin.Context, param any, response *app.Response) error {
-	if err := c.ShouldBind(param); err != nil {
-		logger.WithTrace(c).Errorf("params errs: %v", err)
-		response.ToErrorResponse(errcode.InvalidParams.WithDetails(err.Error()))
-		return err
-	}
-	return nil
-}
-
 // @Summary 创建文章
 // @Produce json
 // @Param tag_id body string true "标签ID"
@@ -43,7 +34,7 @@ func (Article) checkParams(c *gin.Context, param any, response *app.Response) er
 func (art Article) Create(c *gin.Context) {
 	param := service.CreateArticleRequest{}
 	response := app.NewResponse(c)
-	if art.checkParams(c, &param, response) != nil {
+	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
@@ -68,7 +59,7 @@ func (art Article) Create(c *gin.Context) {
 func (art Article) Get(c *gin.Context) {
 	param := service.ArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
-	if art.checkParams(c, &param, response) != nil {
+	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
@@ -97,7 +88,7 @@ func (art Article) Get(c *gin.Context) {
 func (art Article) List(c *gin.Context) {
 	param := service.ArticleListRequest{}
 	response := app.NewResponse(c)
-	if art.checkParams(c, &param, response) != nil {
+	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
@@ -133,7 +124,7 @@ func (art Article) List(c *gin.Context) {
 func (art Article) Update(c *gin.Context) {
 	param := service.UpdateArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
-	if art.checkParams(c, &param, response) != nil {
+	if app.Validation(c, &param, response) != nil {
 		return
 	}
 
@@ -158,7 +149,7 @@ func (art Article) Update(c *gin.Context) {
 func (art Article) Delete(c *gin.Context) {
 	param := service.DeleteArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
-	if art.checkParams(c, &param, response) != nil {
+	if app.Validation(c, &param, response) != nil {
 		return
 	}
 

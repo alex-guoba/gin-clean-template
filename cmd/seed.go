@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"github.com/alex-guoba/gin-clean-template/global"
+	"github.com/alex-guoba/gin-clean-template/internal/dao"
 	"github.com/alex-guoba/gin-clean-template/internal/dao/seed"
 
 	log "github.com/sirupsen/logrus"
@@ -20,11 +21,14 @@ var seedCmd = &cobra.Command{
 	Use:   "seed",
 	Short: "Seed blog service database",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := setupDBEngine(); err != nil {
+		var err error
+		global.DBEngine, err = dao.NewDBEngine(&global.Config.Database)
+		if err != nil {
+			log.Error("init db error. ", err)
 			return
 		}
 
-		if err := seed.Seed(global.DBEngine, seedCount); err != nil {
+		if err = seed.Seed(global.DBEngine, seedCount); err != nil {
 			log.Error("seed db error. ", err)
 			return
 		}
