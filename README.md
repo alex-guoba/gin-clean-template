@@ -72,6 +72,7 @@ Bucket           #       %       Histogram
 ```
 
 - [x] Graceful shutdown on interrupt signals
+- [x] Swagger docs
 
 ## Layered Architecture 
 
@@ -110,7 +111,7 @@ Storage layer, facing the logical expression of operations on storage objects, i
 - [x] setup command to init db, including faking data generated.
 
 ### New features
-- [ ] Swagger docs
+- [x] Swagger docs
 - [ ] Resource upload support, like S3, minio.
 - [ ] Auth with OIDC.
 - [ ] Enable Cache
