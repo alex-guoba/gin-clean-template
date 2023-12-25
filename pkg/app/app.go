@@ -21,6 +21,14 @@ type Pager struct {
 	TotalRows int `json:"total_rows"`
 }
 
+type ListResponse struct {
+	// 列表数据
+	List  any   `json:"list"`
+	Pager Pager `json:"pager"`
+}
+
+type MapResponse map[string]string
+
 func NewResponse(ctx *gin.Context) *Response {
 	return &Response{
 		Ctx: ctx,
@@ -34,16 +42,16 @@ func (r *Response) ToResponse(data any) {
 	r.Ctx.JSON(http.StatusOK, data)
 }
 
-func (r *Response) ToResponseList(list any, totalRows int, page int, pageSize int) {
-	r.Ctx.JSON(http.StatusOK, gin.H{
-		"list": list,
-		"pager": Pager{
-			Page:      page,
-			PageSize:  pageSize,
-			TotalRows: totalRows,
-		},
-	})
-}
+// func (r *Response) ToResponseList(list any, totalRows int, page int, pageSize int) {
+// 	r.Ctx.JSON(http.StatusOK, gin.H{
+// 		"list": list,
+// 		"pager": Pager{
+// 			Page:      page,
+// 			PageSize:  pageSize,
+// 			TotalRows: totalRows,
+// 		},
+// 	})
+// }
 
 func (r *Response) ToErrorResponse(err *errcode.Error) {
 	response := gin.H{"code": err.Code, "msg": err.Msg}

@@ -4,8 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/alex-guoba/gin-clean-template/internal/service"
 	"github.com/alex-guoba/gin-clean-template/pkg/app"
 	"github.com/alex-guoba/gin-clean-template/pkg/convert"
@@ -35,7 +33,7 @@ func NewArticle(db *gorm.DB, cfg *setting.Configuration) Article {
 // @Param content body string true "文章内容"
 // @Param created_by body int true "创建者"
 // @Param state body int false "状态"
-// @Success 200 {object} model.Article "成功"
+// @Success 200 {object} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles [post].
@@ -60,7 +58,7 @@ func (art *Article) Create(c *gin.Context) {
 // @Summary 获取单个文章
 // @Produce json
 // @Param id path int true "文章ID"
-// @Success 200 {object} model.Article "成功"
+// @Success 200 {object} entity.ArticleEntity "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles/{id} [get].
@@ -89,7 +87,7 @@ func (art *Article) Get(c *gin.Context) {
 // @Param state query int false "状态"
 // @Param page query int false "页码"
 // @Param page_size query int false "每页数量"
-// @Success 200 {object} model.ArticleSwagger "成功"
+// @Success 200 {object} app.ListResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles [get].
@@ -100,24 +98,25 @@ func (art *Article) List(c *gin.Context) {
 		return
 	}
 
-	svc := service.NewArticleService(c.Request.Context(), art.db)
-	pager := app.Pager{
-		Page:     app.GetPage(c),
-		PageSize: app.GetPageSize(c, art.cfg.App.DefaultPageSize, art.cfg.App.MaxPageSize),
+	rsp := &app.ListResponse{
+		Pager: app.Pager{
+			Page:     app.GetPage(c),
+			PageSize: app.GetPageSize(c, art.cfg.App.DefaultPageSize, art.cfg.App.MaxPageSize),
+		},
 	}
-	articles, totalRows, err := svc.GetArticleList(&param, &pager)
+
+	svc := service.NewArticleService(c.Request.Context(), art.db)
+	articles, totalRows, err := svc.GetArticleList(&param, &rsp.Pager)
 	if err != nil {
 		logger.WithTrace(c).Errorf("svc.GetArticleList err: %v", err)
 		response.ToErrorResponse(errcode.ErrorGetArticlesFail)
 		return
 	}
 
-	for _, article := range articles {
-		log.Info(article)
-	}
-	log.Info("total num: ", totalRows)
-
-	response.ToResponseList(articles, totalRows, pager.Page, pager.PageSize)
+	rsp.Pager.TotalRows = totalRows
+	rsp.List = articles
+	response.ToResponse(rsp)
+	// response.ToResponseList(articles, totalRows, pager.Page, pager.PageSize)
 }
 
 // @Summary 更新文章
@@ -128,7 +127,7 @@ func (art *Article) List(c *gin.Context) {
 // @Param cover_image_url body string false "封面图片地址"
 // @Param content body string false "文章内容"
 // @Param modified_by body string true "修改者"
-// @Success 200 {object} model.Article "成功"
+// @Success 200 {object} app.MapResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles/{id} [put].

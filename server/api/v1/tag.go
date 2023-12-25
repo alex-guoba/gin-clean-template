@@ -30,7 +30,7 @@ func NewTag(db *gorm.DB, cfg *setting.Configuration) Tag {
 // @Param state query int false "状态" Enums(0, 1) default(1)
 // @Param page query int false "页码"
 // @Param page_size query int false "每页数量"
-// @Success 200 {object} model.TagSwagger "成功"
+// @Success 200 {object} app.ListResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/tags [get].
@@ -42,19 +42,28 @@ func (tag *Tag) List(c *gin.Context) {
 	}
 
 	svc := service.NewTagService(c.Request.Context(), tag.db)
-	pager := app.Pager{
-		Page:     app.GetPage(c),
-		PageSize: app.GetPageSize(c, tag.cfg.App.DefaultPageSize, tag.cfg.App.MaxPageSize),
-	}
 
-	tags, cnt, err := svc.GetTagListWithCnt(&param, &pager)
+	rsp := &app.ListResponse{
+		Pager: app.Pager{
+			Page:     app.GetPage(c),
+			PageSize: app.GetPageSize(c, tag.cfg.App.DefaultPageSize, tag.cfg.App.MaxPageSize),
+		},
+	}
+	// pager := app.Pager{
+	// 	Page:     app.GetPage(c),
+	// 	PageSize: app.GetPageSize(c, tag.cfg.App.DefaultPageSize, tag.cfg.App.MaxPageSize),
+	// }
+
+	tags, cnt, err := svc.GetTagListWithCnt(&param, &rsp.Pager)
 	if err != nil {
 		logger.WithTrace(c).Errorf("svc.GetTagList err: %v", err)
 		response.ToErrorResponse(errcode.ErrorGetTagListFail)
 		return
 	}
+	rsp.Pager.TotalRows = cnt
+	rsp.List = tags
 
-	response.ToResponseList(tags, cnt, pager.Page, pager.PageSize)
+	response.ToResponse(rsp)
 }
 
 // @Summary 新增标签
@@ -62,7 +71,7 @@ func (tag *Tag) List(c *gin.Context) {
 // @Param name body string true "标签名称" minlength(3) maxlength(100)
 // @Param state body int false "状态" Enums(0, 1) default(1)
 // @Param created_by body string false "创建者" minlength(3) maxlength(100)
-// @Success 200 {object} model.Tag "成功"
+// @Success 200 {object} app.MapResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/tags [post].
@@ -88,7 +97,7 @@ func (tag *Tag) Create(c *gin.Context) {
 // @Param name body string false "标签名称" minlength(3) maxlength(100)
 // @Param state body int false "状态" Enums(0, 1) default(1)
 // @Param modified_by body string true "修改者" minlength(3) maxlength(100)
-// @Success 200 {array} model.Tag "成功"
+// @Success 200 {array} app.MapResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/tags/{id} [put].

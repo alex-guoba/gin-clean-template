@@ -28,6 +28,6 @@ swagger:
 	go install github.com/swaggo/swag/cmd/swag@latest
 	go get github.com/swaggo/swag/gen@latest
 	go get github.com/swaggo/swag/cmd/swag@latest
-	cd pkg/api && $$(go env GOPATH)/bin/swag init -g server.go
+	cd ./server && $$(go env GOPATH)/bin/swag init --parseDependency -g server.go
 
 .PHONY: mysql_install db_create lint
