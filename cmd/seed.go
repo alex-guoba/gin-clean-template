@@ -20,7 +20,7 @@ var (
 var seedCmd = &cobra.Command{
 	Use:   "seed",
 	Short: "Seed blog service database",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		var config setting.Configuration
 
 		if err := setting.LoadConfig(&config); err != nil {

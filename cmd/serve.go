@@ -28,7 +28,7 @@ var rootCmd = &cobra.Command{
 	Use:   "gin-clean-template",
 	Short: "A clean architecture template for Golang Gin services",
 
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		var config setting.Configuration
 
 		if err := setting.LoadConfig(&config); err != nil {

@@ -7,10 +7,8 @@ import (
 	"github.com/alex-guoba/gin-clean-template/internal/middleware/ratelimit"
 	"github.com/alex-guoba/gin-clean-template/pkg/setting"
 	"github.com/alex-guoba/gin-clean-template/server/api"
-	_ "github.com/alex-guoba/gin-clean-template/server/docs"
-
-	swaggerfiles "github.com/swaggo/files"     // swagger embed files
-	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
+	swaggerfiles "github.com/swaggo/files" // swagger embed files
+	gswag "github.com/swaggo/gin-swagger"  // gin-swagger middleware
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -68,7 +66,7 @@ func NewServer(cfg *setting.Configuration, db *gorm.DB) *Server {
 	api.SetRouters(r, cfg, db)
 
 	// swagger middleware
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	r.GET("/swagger/*any", gswag.WrapHandler(swaggerfiles.Handler))
 
 	return s
 }

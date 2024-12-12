@@ -1,7 +1,7 @@
 
 # Gin Clean Template
 
-Clean Architecture template for Golang Gin services
+Clean Architecture template for Golang services using Gin framework.
 
 ## Overview 
 
@@ -10,6 +10,9 @@ This is an example of implementation of Gin framework (Golang) service.
 - Services are split into multiple layers according to the DDD hierarchical architecture.
 - Testabe. Domain or DAO layer can be testable without Database. 
 - Database Independence. used GORM to hide the implementation of database, it can be replace by [other](https://gorm.io/docs/connecting_to_the_database.html) DB.
+- Support database schema migration from migration source('db/migration'). see [migrate](https://github.com/golang-migrate/migrate) for more details.
+- Support load testing.
+- Support overload protection.
 
 
 ## Quick start
@@ -71,8 +74,24 @@ Bucket           #       %       Histogram
 [1s,     +Inf]   1       0.00%
 ```
 
+- [x] Unit Test
+
+``` shell
+» make test
+
+coverage: 72.0% of statements
+ok      github.com/alex-guoba/gin-clean-template/internal/middleware/ratelimit  0.340s  coverage: 72.0% of statements
+```
+
 - [x] Graceful shutdown on interrupt signals
 - [x] Swagger docs
+- [x] golang-lint 
+
+```shell
+» make lint
+```
+
+- [x] docker-compose 
 
 ## Layered Architecture 
 
@@ -107,7 +126,6 @@ Storage layer, facing the logical expression of operations on storage objects, i
 
 ### Optimization
 - [x] Remove global: [Why is Global State so Evil?](https://softwareengineering.stackexchange.com/questions/148108/why-is-global-state-so-evil)
-- [x] Enable Docker 
 - [x] setup command to init db, including faking data generated.
 
 ### New features

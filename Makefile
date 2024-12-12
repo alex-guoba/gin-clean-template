@@ -23,6 +23,9 @@ migration_new:
 lint:
 	golangci-lint run
 
+# unit test coverage
+unittest:
+	go test ./... --covermode=count '-gcflags=all=-N -l' -v
 
 swagger:
 	go install github.com/swaggo/swag/cmd/swag@latest
