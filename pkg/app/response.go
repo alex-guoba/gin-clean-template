@@ -19,16 +19,12 @@ type ResponseSuccess struct {
 }
 
 type Pager struct {
-	// 页码
-	Page int `json:"page"`
-	// 每页数量
-	PageSize int `json:"page_size"`
-	// 总行数
+	Page      int `json:"page"`
+	PageSize  int `json:"page_size"`
 	TotalRows int `json:"total_rows"`
 }
 
 type ListResponse struct {
-	// 列表数据
 	List  any   `json:"list"`
 	Pager Pager `json:"pager"`
 }

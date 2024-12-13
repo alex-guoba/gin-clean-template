@@ -16,6 +16,14 @@ linters:
     - forbidigo
     - mirror
     - bodyclose
+    # - depguard
+    - dogsled
+    - dupl
+    - errcheck
+    - funlen
+    - goconst
+    - gocyclo
+    - gofmt
 
 issues:
   include:
@@ -85,3 +93,7 @@ linters-settings:
       - 'ioutil\.ReadDir(# Please use os\.ReadDir)?'
   godot:
     period: false
+
+  funlen:
+    lines: 120
+    statements: 50
