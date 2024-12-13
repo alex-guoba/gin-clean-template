@@ -4,11 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/alex-guoba/gin-clean-template/internal/middleware/ratelimit"
+	"github.com/alex-guoba/gin-clean-template/internal/middleware"
 	"github.com/alex-guoba/gin-clean-template/pkg/setting"
 	"github.com/alex-guoba/gin-clean-template/server/api"
-	swaggerfiles "github.com/swaggo/files" // swagger embed files
-	gswag "github.com/swaggo/gin-swagger"  // gin-swagger middleware
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -35,8 +33,10 @@ type Server struct {
 
 func NewServer(cfg *setting.Configuration, db *gorm.DB) *Server {
 	r := gin.New()
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
+
+	middleware.UseDefault(r, cfg)
+
+	api.SetRouters(r, cfg, db)
 
 	srv := &http.Server{
 		Addr:           ":" + cfg.Server.HTTPPort,
@@ -46,29 +46,12 @@ func NewServer(cfg *setting.Configuration, db *gorm.DB) *Server {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	s := &Server{
+	return &Server{
 		Config: cfg,
 		Svr:    srv,
 		Router: r,
 		DB:     db,
 	}
-
-	// rate limit middleware
-	if cfg.Ratelimit.Enable {
-		limiter := ratelimit.New(cfg.Ratelimit.ConfigFile,
-			cfg.Ratelimit.CPULoadThresh, cfg.Ratelimit.CPULoadStrategy)
-		if limiter == nil {
-			log.Error("init rate limit middleware failed, ignored")
-		} else {
-			r.Use(limiter)
-		}
-	}
-	api.SetRouters(r, cfg, db)
-
-	// swagger middleware
-	r.GET("/swagger/*any", gswag.WrapHandler(swaggerfiles.Handler))
-
-	return s
 }
 
 func (s *Server) Start() error {
