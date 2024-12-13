@@ -1,7 +1,7 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 */
-package cmd
+package cmds
 
 import (
 	"github.com/alex-guoba/gin-clean-template/internal/dao"

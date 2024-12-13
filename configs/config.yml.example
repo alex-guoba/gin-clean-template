@@ -8,7 +8,7 @@ App:
   MaxPageSize: 20
   ServerShutdownTimeout: 10s
 Log:
-  LogSavePath: storage/logs
+  LogSavePath: var/logs
   LogFileName: app.log
   Level: info
   MaxSize: 10

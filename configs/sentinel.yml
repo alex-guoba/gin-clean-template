@@ -4,7 +4,7 @@ sentinel:
     name: gin-clean-template
     type: 0
   log:
-    dir: "storage/logs/csp"
+    dir: "var/logs/csp"
     pid: false
     metric:
       maxFileCount: 4

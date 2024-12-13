@@ -7,6 +7,13 @@ VERSION:=$(shell grep 'VERSION' pkg/version/version.go | awk '{ print $$4 }' | t
 
 .DEFAULT_GOAL := lint
 
+# build
+build:
+	go build -o ./bin/gin-clean-template ./cmd/main.go
+
+clean:
+	rm ./bin/gin-clean-template
+
 # Start mysql container
 mysql_install:
 	docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=$(DBSECRET) mysql
