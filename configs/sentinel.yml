@@ -8,22 +8,22 @@ sentinel:
     pid: false
     metric:
       maxFileCount: 4
-      flushIntervalSec: 10 # 监控日志聚合和刷盘的时间频率
-      singleFileMaxSize: 10240000 # 日志文件大小
+      flushIntervalSec: 10
+      singleFileMaxSize: 10240000
   stat:
-    globalStatisticSampleCountTotal: 20 # 资源的bucket个数，默认20个bucket
-    globalStatisticIntervalMsTotal: 10000 # 资源默认统计时长
+    globalStatisticSampleCountTotal: 20
+    globalStatisticIntervalMsTotal: 10000
     metricStatisticSampleCount: 2 
     metricStatisticIntervalMs: 1000
     system:
-      collectIntervalMs: 1000 # 下面三个统计周期的默认值
-      collectLoadIntervalMs: 1000 # 负载统计周期
-      collectCpuIntervalMs: 1000 # cpu统计周期
-      collectMemoryIntervalMs: 500 # 内存统计周期, default 150
+      collectIntervalMs: 1000
+      collectLoadIntervalMs: 1000
+      collectCpuIntervalMs: 1000
+      collectMemoryIntervalMs: 500
 
   export:
-    metric: # 本地Prometheus配置
+    metric:
         http_addr: 127.0.0.1:8080
       http_path: /metrics
 
-  useCacheTime: true # 时间更新定时器，减少系统调用对性能开销的影响
+  useCacheTime: true
