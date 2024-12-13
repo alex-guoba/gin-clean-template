@@ -3,5 +3,7 @@ _*
 *.test
 .DS_Store
 bin/
+var/
 *.out
 scripts/load-testing/output.bin
+tmp/

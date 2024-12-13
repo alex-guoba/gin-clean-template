@@ -3,11 +3,11 @@ testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-args_bin = []
+args_bin = ["--config=./bin/config.yml"]
 bin = "./bin/gin-clean-template"
-cmd = "make buid"
+cmd = "make build"
 delay = 1000
-exclude_dir = ["assets", "tmp", "vendor", "testdata", "var"]
+exclude_dir = ["assets", "tmp", "vendor", "testdata", "var", "bin"]
 exclude_file = []
 exclude_regex = ["_test.go"]
 exclude_unchanged = false

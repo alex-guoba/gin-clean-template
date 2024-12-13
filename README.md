@@ -11,29 +11,34 @@ This is an example of implementation of Gin framework (Golang) service.
 - Testabe. Domain or DAO layer can be testable without Database. 
 - Database Independence. used GORM to hide the implementation of database, it can be replace by [other](https://gorm.io/docs/connecting_to_the_database.html) DB.
 - Support database schema migration from migration source('db/migration'). see [migrate](https://github.com/golang-migrate/migrate) for more details.
-- Support load testing.
-- Support overload protection.
-- Use Viper to manage configuration.
+- Use [sentinel](https://github.com/alibaba/sentinel-golang) to implement overload protection capabilities.
+- Use [gin-swagger](https://github.com/swaggo/gin-swagger) to generate swagger documentation.
+- Use [viper](https://github.com/spf13/viper) to manage configuration files.
+- Use [gin-gonic/gin](https://github.com/gin-gonic/gin) as the web framework.
+- Use [air](https://github.com/cosmtrek/air) for hot reload.
 
 
 ## Quick start
 
 ```sh
 # build
-$ go build
+$ make build
 
 # configuration files
-$ cp configs/config.yml.example configs/config.yml
+$ cp configs/config.yml.example bin/config.yml
 
 # preinstall:  mysql, see Makefile or docker file
 $ make mysql_install
 $ make db_create
 
 # Run app with defualt configuaration in configs/config.yml
-$ ./gin-clean-template
+$ ./bin/gin-clean-template --config=bin/config.yml
 
 # Also support docker to startup
 $ docker-compose up
+
+# develop (make sure you have air installed)
+$ air
 ```
 
 ## Features
@@ -96,6 +101,9 @@ ok      github.com/alex-guoba/gin-clean-template/internal/middleware/ratelimit  
 ```
 
 - [x] docker-compose 
+- [x] air for hot reload
+
+air configuration file is in `.air.toml`
 
 ## Layered Architecture 
 

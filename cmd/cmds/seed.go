@@ -21,14 +21,12 @@ var seedCmd = &cobra.Command{
 	Use:   "seed",
 	Short: "Seed blog service database",
 	Run: func(_ *cobra.Command, _ []string) {
-		var config setting.Configuration
-
-		if err := setting.LoadConfig(&config); err != nil {
-			log.Error("loading config file failed.", err)
+		if err := svrInit(); err != nil {
+			log.Error("init server failed.", err)
 			return
 		}
 
-		engine, err := dao.NewDBEngine(&config.Database)
+		engine, err := dao.NewDBEngine(&setting.Conf.Database)
 		if err != nil {
 			log.Error("init db error. ", err)
 			return
@@ -47,14 +45,4 @@ func init() {
 	seedCmd.Flags().IntVar(&seedCount, "count", 1, "seed record count.")
 
 	rootCmd.AddCommand(seedCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// seedCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// seedCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

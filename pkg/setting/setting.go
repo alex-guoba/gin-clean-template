@@ -7,6 +7,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	Conf = &Configuration{}
+)
+
 // type EmailSettingS struct {
 // 	Host     string
 // 	Port     int
@@ -80,10 +84,17 @@ type Configuration struct {
 	Ratelimit RatelimitSettingS `mapstructure:"Ratelimit"`
 }
 
-func LoadConfig(cfg *Configuration) error {
-	viper.AddConfigPath("configs/")
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+func Load(cfgFile string) error {
+	if cfgFile != "" {
+		viper.SetConfigFile(cfgFile)
+	} else {
+		viper.AddConfigPath("configs/")
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+	}
+	// viper.AddConfigPath("configs/")
+	// viper.SetConfigName("config")
+	// viper.SetConfigType("yaml")
 
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(`.`, `_`))
@@ -92,7 +103,7 @@ func LoadConfig(cfg *Configuration) error {
 	if err != nil {
 		return err
 	}
-	err = viper.Unmarshal(cfg)
+	err = viper.Unmarshal(Conf)
 	if err != nil {
 		return err
 	}

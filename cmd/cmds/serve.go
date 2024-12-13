@@ -5,7 +5,8 @@ package cmds
 
 import (
 	"fmt"
-	"path/filepath"
+
+	"github.com/pkg/errors"
 
 	"github.com/alex-guoba/gin-clean-template/internal/dao"
 	"github.com/alex-guoba/gin-clean-template/pkg/logger"
@@ -24,35 +25,38 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var cfgFile string
+
+func svrInit() error {
+	if err := setting.Load(cfgFile); err != nil {
+		return errors.Wrap(err, "loading config file failed")
+	}
+	gin.SetMode(setting.Conf.Server.RunMode)
+
+	logger.SetupLogger(&setting.Conf.Log)
+
+	return nil
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "gin-clean-template",
 	Short: "A clean architecture template for Golang Gin services",
 
 	Run: func(_ *cobra.Command, _ []string) {
-		var config setting.Configuration
-
-		if err := setting.LoadConfig(&config); err != nil {
-			log.Error("loading config file failed.", err)
+		if err := svrInit(); err != nil {
+			log.Error("init server failed.", err)
 			return
 		}
 
-		gin.SetMode(config.Server.RunMode)
-
-		// init logger
-		logger.SetupLogger(
-			filepath.Join(config.Log.LogSavePath, config.Log.LogFileName),
-			config.Log.MaxSize, config.Log.MaxBackups, config.Log.Compress,
-			config.Log.Level)
-
 		// init db
-		engine, err := dbInit(&config.Database)
+		engine, err := dbInit(&setting.Conf.Database)
 		if err != nil {
 			log.Error("init db failed.", err)
 			return
 		}
 
 		// start http server
-		svr := server.NewServer(&config, engine)
+		svr := server.NewServer(setting.Conf, engine)
 		if err := svr.Start(); err != nil {
 			log.Error("init server failed.", err)
 			return
@@ -60,7 +64,7 @@ var rootCmd = &cobra.Command{
 
 		// graceful shutdown
 		stopCh := signals.SetupSignalHandler()
-		sd, _ := signals.NewShutdown(config.App.ServerShutdownTimeout)
+		sd, _ := signals.NewShutdown(setting.Conf.App.ServerShutdownTimeout)
 		sd.Graceful(stopCh, svr, engine)
 	},
 }
@@ -104,8 +108,6 @@ func dbInit(dbc *setting.DatabaseSettingS) (*gorm.DB, error) {
 }
 
 func init() {
-	// cobra.OnInitialize(initConfig)
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gin-clean-template.yaml)")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "./config.yml", "config file (default is ./config.yaml)")
 }
